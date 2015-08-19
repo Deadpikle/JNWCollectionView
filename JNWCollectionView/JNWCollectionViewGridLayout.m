@@ -64,6 +64,7 @@ static const CGSize JNWCollectionViewGridLayoutDefaultSize = (CGSize){ 44.f, 44.
 @property (nonatomic, strong) NSMutableArray *sections;
 @property (nonatomic, assign) NSUInteger numberOfColumns;
 @property (nonatomic, assign) CGFloat itemPadding;
+@property (nonatomic, strong) JNWCollectionViewLayoutAttributes *markerAttributes;
 @end
 
 @implementation JNWCollectionViewGridLayout
@@ -157,6 +158,18 @@ static const CGSize JNWCollectionViewGridLayoutDefaultSize = (CGSize){ 44.f, 44.
 		totalHeight += sectionInfo.height + footerHeight + headerHeight + sectionInsets.bottom + sectionInsets.top;
 		[self.sections addObject:sectionInfo];
 	}
+    
+    if (self.collectionView.dragContext.dropPath) {
+        JNWCollectionViewDropIndexPath *indexPath = self.collectionView.dragContext.dropPath;
+        JNWCollectionViewLayoutAttributes *attributes = [self layoutAttributesForItemAtIndexPath:indexPath];
+        CGRect frame = attributes.frame;
+        frame.size.height = 1;
+        attributes.frame = frame;
+        
+        _markerAttributes = attributes;
+    } else {
+        _markerAttributes = nil;
+    }
 }
 
 - (JNWCollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -279,6 +292,30 @@ static const CGSize JNWCollectionViewGridLayoutDefaultSize = (CGSize){ 44.f, 44.
 	NSInteger rowBegin = relativeRectTop / (self.itemSize.height + self.verticalSpacing);
 	NSInteger rowEnd = floorf(relativeRectBottom / self.itemSize.height);
 	return NSMakeRange(rowBegin, 1 + rowEnd - rowBegin);
+}
+
+#pragma Drag and Drop
+
+- (JNWCollectionViewDropIndexPath *)dropIndexPathAtPoint:(NSPoint)point {
+    //for (JNWCollectionViewGridLayoutSection *section in self.sections) {
+        //NSRange range = [self rowsInRect:CGRectMake(point.x, point.y, 1, 1) fromSection:section];
+        // NSLog(@"Point: %f, %f", point.x, point.y);
+        NSArray *visibleCells = [self.collectionView visibleCells];
+        for (JNWCollectionViewCell *cell in visibleCells) {
+            if (CGRectContainsPoint(cell.frame, point)) {
+                //  NSLog(@"Found it!");
+                NSIndexPath *path = [self.collectionView indexPathForCell:cell];
+                if (path)
+                    return [JNWCollectionViewDropIndexPath indexPathForItem:path.jnw_item inSection:path.jnw_section dropRelation:JNWCollectionViewDropRelationAt];
+            }
+        }
+   // }
+    
+    return nil;
+}
+
+- (JNWCollectionViewLayoutAttributes *)layoutAttributesForDropMarker {
+    return _markerAttributes;
 }
 
 @end

@@ -9,8 +9,8 @@
 #import "GridDemoViewController.h"
 #import "GridCell.h"
 
-@interface GridDemoViewController()
-@property (nonatomic, strong) NSArray *images;
+@interface GridDemoViewController() <JNWCollectionViewDragDropDelegate>
+@property (nonatomic, strong) NSMutableArray *images;
 @property (nonatomic, strong) IBOutlet NSSlider *sizeSlider;
 @end
 
@@ -31,6 +31,7 @@ static NSString * const identifier = @"CELL";
 	
 	self.collectionView.collectionViewLayout = gridLayout;
 	self.collectionView.dataSource = self;
+    self.collectionView.dragDropDelegate = self;
 	self.collectionView.animatesSelection = NO; // (this is the default option)
 	
 	[self.collectionView registerClass:GridCell.class forCellWithReuseIdentifier:identifier];
@@ -91,7 +92,28 @@ static NSString * const identifier = @"CELL";
 		[images addObject:image];
 	}
 	
-	self.images = images.copy;
+	self.images = images;
+}
+
+- (NSArray *)draggedTypesForCollectionView:(JNWCollectionView *)collectionView {
+    return @[ NSStringPboardType ];
+}
+
+- (BOOL)collectionView:(JNWCollectionView *)collectionView performDragOperation:(id<NSDraggingInfo>)sender fromIndexPaths:(NSArray *)dragIndexPaths toIndexPath:(JNWCollectionViewDropIndexPath *)dropIndexPath {
+    if ([dragIndexPaths count] > 0 && dropIndexPath) {
+        long fromIndex = ((NSIndexPath*)dragIndexPaths[0]).jnw_item % 30;
+        long toIndex = dropIndexPath.jnw_item % 30;
+        [self.images exchangeObjectAtIndex:fromIndex withObjectAtIndex:toIndex];
+        [self.collectionView reloadData];
+        return YES;
+    }
+    return NO;
+}
+
+- (id<NSPasteboardWriting>)collectionView:(JNWCollectionView *)collectionView pasteboardWriterForItemAtIndexPath:(NSIndexPath *)indexPath {
+    NSPasteboardItem *pboardItem = [[NSPasteboardItem alloc] init];
+    [pboardItem setString:[NSString stringWithFormat:@"%ld - %ld", (long)indexPath.jnw_section, (long)indexPath.jnw_item] forType:NSPasteboardTypeString];
+    return pboardItem;
 }
 
 @end

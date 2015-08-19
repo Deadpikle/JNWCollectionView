@@ -24,20 +24,12 @@
 }
 
 - (void)updateBackgroundImage {
-	NSImage *image = nil;
-	
 	if (self.selected) {
-		NSString *identifier = [NSString stringWithFormat:@"%@%x", NSStringFromClass(self.class), self.selected];
-		CGSize size = CGSizeMake(1, CGRectGetHeight(self.bounds));
-		image = [DemoImageCache.sharedCache cachedImageWithIdentifier:identifier size:size withCreationBlock:^NSImage * (CGSize size) {
-			return [NSImage highlightedGradientImageWithHeight:size.height];
-		}];
+        [[self layer] setBorderColor:[[NSColor redColor] CGColor]];
+        [[self layer] setBorderWidth:3.0f];
 	} else {
-		image = self.image;
-	}
-	
-	if (self.backgroundImage != image) {
-		self.backgroundImage = image;
+        [[self layer] setBorderColor:[[NSColor clearColor] CGColor]];
+        [[self layer] setBorderWidth:0.0f];
 	}
 }
 
