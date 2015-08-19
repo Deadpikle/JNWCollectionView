@@ -14,7 +14,7 @@ The easiest way to understand what this framework can do is to just dive in with
 
 ## Updates on this fork ##
 
-This fork uses the latest (as of 2015-08-19) version of `JNWCollectionView` and adds drag and drop support from https://github.com/DarkDust/JNWCollectionView. The API was mostly kept the same, but a few modifications were made. 
+This fork uses the latest (as of 2015-08-19) version of `JNWCollectionView` and adds drag and drop support from https://github.com/DarkDust/JNWCollectionView. The API was mostly kept the same, but a few modifications were made. Please note that most of the drag/drop functionality really needs to be refactored to the layout as much as possible; currently, that hasn't been done yet.
 
 To access drag and drop functionality, your view controller (or whatever is managing the `JNWCollectionView`) should implement the following:
 ```objc
