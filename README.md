@@ -12,6 +12,30 @@ The easiest way to understand what this framework can do is to just dive in with
 
 `JNWCollectionView` requires OS X 10.8+.
 
+## Updates on this fork ##
+
+This fork uses the latest (as of 2015-08-19) version of `JNWCollectionView` and adds drag and drop support from https://github.com/DarkDust/JNWCollectionView. The API was mostly kept the same, but a few modifications were made. 
+
+To access drag and drop functionality, your view controller (or whatever is managing the `JNWCollectionView`) should implement the following:
+```objc
+- (id<NSPasteboardWriting>)collectionView:(JNWCollectionView *)collectionView pasteboardWriterForItemAtIndexPath:(NSIndexPath *)indexPath;
+- (NSArray *)draggedTypesForCollectionView:(JNWCollectionView *)collectionView ;
+- (BOOL)collectionView:(JNWCollectionView *)collectionView performDragOperation:(id<NSDraggingInfo>)sender fromIndexPaths:(NSArray *)dragIndexPaths toIndexPath:(JNWCollectionViewDropIndexPath *)dropIndexPath;
+```
+and should also ensure that the view controller is set up properly:
+```objc
+@interface ListDemoViewController : NSViewController <..., JNWCollectionViewDragDropDelegate>
+// in the implementation when you're setting up the collection view...
+self.collectionView.dragDropDelegate = self;
+```
+The drag and drop marker is optional.
+
+Things that should change to improve the drag & drop API/Demo:
+- Allow for putting the drag and drop marker in the layout (or somesuch) so that the drop marker can actually be a table row, grid cell, etc.
+- Make more delegate protocol options optional instead of required (such as the pasteboard stuff -- do we really need this?)
+- Improve the grid drag & drop example (there's no drop marker, for instance)
+- No way to add new sections in table list (what would be a good way to do this?)
+
 ## Getting Started ##
 
 `JNWCollectionView` inherits from `NSScrollView`, so it can either be instantiated through code or in Interface Builder. The following example demonstrates creating a collection view through code.
@@ -45,7 +69,8 @@ collectionView.dataSource = self;
 `JNWCollectionView` does not automatically pick a layout class. Two layout classes are included (and will be described later). For this example, lets pick the grid layout. However, the layout class is designed to be subclassed so you are not limited to the built-in layouts.
 
 ```objc
-JNWCollectionViewGridLayout *gridLayout = [[JNWCollectionViewGridLayout alloc] initWithCollectionView:collectionView];
+JNWCollectionViewGridLayout *gridLayout = [[JNWCollectionViewGridLayout alloc] init];
+// Note that initWithCollectionView: is deprecated.
 
 // The grid layout has its own delegate, so if we want to implement the delegate methods
 // we need to conform to JNWCollectionViewGridLayoutDelegate.
