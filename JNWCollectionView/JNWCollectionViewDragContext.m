@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2013, Jonathan Willing. All rights reserved.
+ Copyright (c) 2013, Marc Haisenko, equinux AG. All rights reserved.
  Licensed under the MIT license <http://opensource.org/licenses/MIT>
  
  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -16,22 +16,10 @@
  CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  IN THE SOFTWARE.
  */
+// Drag and drop implementation modified from https://github.com/DarkDust/JNWCollectionView (MIT licensed)
 
-#import "JNWCollectionViewFramework.h"
+#import "JNWCollectionViewDragContext.h"
 
-@class JNWCollectionViewCell;
-@interface JNWCollectionView ()
-
-- (void)mouseDownInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event;
-- (void)mouseUpInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event;
-- (void)doubleClickInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event;
-- (void)rightClickInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event;
-
-- (NSString *)kindForSupplementaryViewIdentifier:(NSString *)identifier;
-- (NSArray *)allSupplementaryViewIdentifiers;
-
-- (void)collectionViewLayoutWasInvalidated:(JNWCollectionViewLayout *)layout;
-
-- (void)mouseDraggedInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event;
+@implementation JNWCollectionViewDragContext
 
 @end

@@ -76,4 +76,14 @@
 	return YES;
 }
 
+#pragma mark Drag and Drop
+
+- (JNWCollectionViewDropIndexPath *)dropIndexPathAtPoint:(NSPoint)point {
+    return nil;
+}
+
+- (JNWCollectionViewLayoutAttributes *)layoutAttributesForDropMarker {
+    return nil;
+}
+
 @end

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2013, Jonathan Willing. All rights reserved.
+ Copyright (c) 2013, Marc Haisenko, equinux AG. All rights reserved.
  Licensed under the MIT license <http://opensource.org/licenses/MIT>
  
  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -16,22 +16,31 @@
  CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  IN THE SOFTWARE.
  */
+// Drag and drop implementation modified from https://github.com/DarkDust/JNWCollectionView (MIT licensed)
 
-#import "JNWCollectionViewFramework.h"
+#import "JNWCollectionViewDropIndexPath.h"
 
-@class JNWCollectionViewCell;
-@interface JNWCollectionView ()
+@implementation JNWCollectionViewDropIndexPath
 
-- (void)mouseDownInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event;
-- (void)mouseUpInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event;
-- (void)doubleClickInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event;
-- (void)rightClickInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event;
++ (instancetype)indexPathForItem:(NSInteger)item inSection:(NSInteger)section dropRelation:(JNWCollectionViewDropRelation)relation {
+    NSUInteger indexPath[3] = { section , item , relation };
+    return [self indexPathWithIndexes:indexPath length:3];
+}
 
-- (NSString *)kindForSupplementaryViewIdentifier:(NSString *)identifier;
-- (NSArray *)allSupplementaryViewIdentifiers;
+- (NSInteger)jnw_section {
+    return [self indexAtPosition:0];
+}
 
-- (void)collectionViewLayoutWasInvalidated:(JNWCollectionViewLayout *)layout;
+- (NSInteger)jnw_item {
+    return [self indexAtPosition:1];
+}
 
-- (void)mouseDraggedInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event;
+- (JNWCollectionViewDropRelation)jnw_relation {
+    return [self indexAtPosition:2];
+}
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"<%@: %p section %ld item %ld relation %ld", [self class], self, self.jnw_section, self.jnw_item, (NSInteger)self.jnw_relation];
+}
 
 @end

@@ -16,6 +16,7 @@
  CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  IN THE SOFTWARE.
  */
+// Drag and drop implementation modified from https://github.com/DarkDust/JNWCollectionView (MIT licensed)
 
 #import "JNWCollectionViewFramework.h"
 #import "JNWCollectionView+Private.h"
@@ -51,6 +52,8 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewSelectionType) {
 		unsigned int delegateDidRightClick:1;
 		unsigned int delegateDidEndDisplayingCell:1;
 		
+		unsigned int dragDropDelegateDropMarker:1;
+		
 		unsigned int wantsLayout;
 	} _collectionViewFlags;
 	
@@ -76,6 +79,9 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewSelectionType) {
 @property (nonatomic, strong) NSMutableDictionary *supplementaryViewNibMap; // { "kind/identifier" : nib }
 
 @property (nonatomic, strong) NSView *documentView;
+
+// Drag and drop
+@property (nonatomic, strong) NSView *dropMarker;
 
 @end
 
@@ -155,6 +161,15 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 			 @"data source must implement collectionView:numberOfItemsInSection");
 	NSAssert(dataSource == nil || [dataSource respondsToSelector:@selector(collectionView:cellForItemAtIndexPath:)],
 			 @"data source must implement collectionView:cellForItemAtIndexPath:");
+}
+
+- (void)setDragDropDelegate:(id<JNWCollectionViewDragDropDelegate>)dragDropDelegate {
+	_dragDropDelegate = dragDropDelegate;
+	
+	[self unregisterDraggedTypes]; // safety measure
+	[self registerForDraggedTypes:[dragDropDelegate draggedTypesForCollectionView:self]];
+	
+	_collectionViewFlags.dragDropDelegateDropMarker = [dragDropDelegate respondsToSelector:@selector(collectionView:dropMarkerViewWithFrame:)];
 }
 
 
@@ -1089,6 +1104,132 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 
 - (void)selectAllItems {
 	[self selectAll:nil];
+}
+
+#pragma mark Drag and drop
+
+- (NSDragOperation)draggingSession:(NSDraggingSession *)session sourceOperationMaskForDraggingContext:(NSDraggingContext)context {
+	return NSDragOperationEvery;
+}
+
+- (void)mouseDraggedInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event {
+	if (_dragDropDelegate) {
+		NSMutableArray *dragItems = [NSMutableArray arrayWithCapacity:self.selectedIndexes.count];
+		
+		for (NSIndexPath *indexPath in self.selectedIndexes) {
+			id<NSPasteboardWriting> pasteboardWriter = [_dragDropDelegate collectionView:self pasteboardWriterForItemAtIndexPath:indexPath];
+			if (pasteboardWriter == nil) {
+				continue;
+			}
+			
+			JNWCollectionViewCell *cell = [self cellForItemAtIndexPath:indexPath];
+			NSDraggingItem *dragItem = [[NSDraggingItem alloc] initWithPasteboardWriter:pasteboardWriter];
+			dragItem.draggingFrame = [self convertRect:cell.frame fromView:self.documentView];
+			dragItem.imageComponentsProvider = ^ {
+				NSImage *image = cell.draggingImageRepresentation;
+				NSSize size = image.size;
+				NSDraggingImageComponent *component = [[NSDraggingImageComponent alloc] initWithKey:NSDraggingImageComponentIconKey];
+				component.contents = image;
+				component.frame = NSMakeRect(0, 0, size.width, size.height);
+				return @[ component ];
+			};
+			[dragItems addObject:dragItem];
+		}
+		
+		_dragContext = [[JNWCollectionViewDragContext alloc] init];
+		[_dragContext setDragPaths:[self.selectedIndexes copy]];
+		
+		if (![self beginDraggingSessionWithItems:dragItems event:event source:self]) {
+			_dragContext = nil;
+		}
+	}
+}
+
+- (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender {
+	if (!_dragContext) {
+		// We've got a drag operation from outside the app.
+		_dragContext = [[JNWCollectionViewDragContext alloc] init];
+	}
+	
+	if (([sender draggingSourceOperationMask] & NSDragOperationGeneric) != 0) {
+		return NSDragOperationGeneric;
+	}
+	else {
+		return NSDragOperationNone;
+	}
+}
+
+- (NSDragOperation)draggingUpdated:(id<NSDraggingInfo>)sender {
+	NSPoint windowPoint = [sender draggingLocation];
+	NSPoint viewPoint = [self.documentView convertPoint:windowPoint fromView:nil];
+	JNWCollectionViewDropIndexPath *dropPath = [_collectionViewLayout dropIndexPathAtPoint:viewPoint];
+	
+	// Check whether the drop path has changed. Avoid repeated calls when both the old and new path are nil.
+	if (![_dragContext.dropPath isEqual:dropPath] && !(dropPath == nil && _dragContext.dropPath == nil)) {
+		_dragContext.dropPath = dropPath;
+		[_collectionViewLayout prepareLayout];
+		[self updateDropMarker];
+	}
+	
+	return _dragContext.dropPath ? NSDragOperationGeneric : NSDragOperationNone;
+}
+
+- (void)draggingExited:(id<NSDraggingInfo>)sender {
+	// Drag has left the view. If it was an external drag operation, clean up
+	// the context.
+	if (!_dragContext.dragPaths) {
+		_dragContext = nil;
+		[_collectionViewLayout prepareLayout];
+		[self updateDropMarker];
+	}
+}
+
+- (void)draggingSession:(NSDraggingSession *)session endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation {
+	if (_dragContext) {
+		_dragContext = nil;
+		[_collectionViewLayout prepareLayout];
+		[self updateDropMarker];
+	}
+}
+
+- (BOOL)prepareForDragOperation:(id<NSDraggingInfo>)sender {
+	return YES;
+}
+
+- (BOOL)performDragOperation:(id<NSDraggingInfo>)sender {
+	BOOL result = NO;
+	
+	if (_dragContext) {
+		NSArray *fromIndexPath = _dragContext.dragPaths;
+		JNWCollectionViewDropIndexPath *toIndexPath = _dragContext.dropPath;
+		
+		_dragContext = nil;
+		[_collectionViewLayout prepareLayout];
+		[self updateDropMarker];
+		
+		result = [_dragDropDelegate collectionView:self performDragOperation:sender fromIndexPaths:fromIndexPath toIndexPath:toIndexPath];
+	}
+	
+	return result;
+}
+
+- (void)updateDropMarker {
+	if (_collectionViewFlags.dragDropDelegateDropMarker) {
+		JNWCollectionViewLayoutAttributes *attributes = [_collectionViewLayout layoutAttributesForDropMarker];
+		NSView *markerView;
+		if (attributes) {
+			markerView = [_dragDropDelegate collectionView:self dropMarkerViewWithFrame:attributes.frame];
+			markerView.alphaValue = attributes.alpha;
+		} else {
+			markerView = nil;
+		}
+		
+		[_dropMarker removeFromSuperview];
+		if (markerView) {
+			[self.documentView addSubview:markerView];
+		}
+		_dropMarker = markerView;
+	}
 }
 
 #pragma mark NSObject

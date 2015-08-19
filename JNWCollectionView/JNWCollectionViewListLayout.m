@@ -63,6 +63,8 @@ NSString * const JNWCollectionViewListLayoutFooterKind = @"JNWCollectionViewList
 
 @interface JNWCollectionViewListLayout()
 @property (nonatomic, strong) NSMutableArray *sections;
+@property (nonatomic, assign) CGRect lastInvalidatedBounds;
+@property (nonatomic, strong) JNWCollectionViewLayoutAttributes *markerAttributes;
 @end
 
 @implementation JNWCollectionViewListLayout
@@ -82,6 +84,10 @@ NSString * const JNWCollectionViewListLayoutFooterKind = @"JNWCollectionViewList
 }
 
 - (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds {
+    if (newBounds.size.width != self.lastInvalidatedBounds.size.width) {
+    	self.lastInvalidatedBounds = newBounds;
+    	return YES;
+    }
 	return NO;
 }
 
@@ -135,9 +141,20 @@ NSString * const JNWCollectionViewListLayoutFooterKind = @"JNWCollectionViewList
 		totalHeight += sectionInfo.height;
 		[self.sections addObject:sectionInfo];
 	}
+    
+    if (self.collectionView.dragContext.dropPath) {
+        JNWCollectionViewDropIndexPath *indexPath = self.collectionView.dragContext.dropPath;
+        JNWCollectionViewLayoutAttributes *attributes = [self layoutAttributesForItemAtIndexPath:indexPath];
+        CGRect frame = attributes.frame;
+        frame.size.height = 1;
+        attributes.frame = frame;
+        _markerAttributes = attributes;
+    } else {
+        _markerAttributes = nil;
+    }
 }
 
-- (JNWCollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath {	
+- (JNWCollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath {
 	JNWCollectionViewLayoutAttributes *attributes = [[JNWCollectionViewLayoutAttributes alloc] init];
 	attributes.frame = [self rectForItemAtIndex:indexPath.jnw_item section:indexPath.jnw_section];
 	attributes.alpha = 1.f;
@@ -265,5 +282,61 @@ NSString * const JNWCollectionViewListLayoutFooterKind = @"JNWCollectionViewList
 	
 	return newIndexPath;
 }
+
+#pragma mark Drag and Drop
+
+- (JNWCollectionViewDropIndexPath *)dropIndexPathAtPoint:(NSPoint)point {
+    for (JNWCollectionViewListLayoutSection *section in self.sections) {
+        if (CGRectContainsPoint(section.frame, NSPointToCGPoint(point))) {
+            NSUInteger index = [self rowInSection:section containingPoint:NSPointToCGPoint(point)];
+            if (index == NSNotFound) {
+                // Bug?
+                return nil;
+            } else {
+                NSIndexPath *testPath = [NSIndexPath jnw_indexPathForItem:index inSection:section.index];
+                if ([self.collectionView.dragContext.dragPaths containsObject:testPath]) {
+                    // Don't drop on a dragged item.
+                    return nil;
+                }
+                else {
+                    return [JNWCollectionViewDropIndexPath indexPathForItem:index inSection:section.index dropRelation:JNWCollectionViewDropRelationAt];
+                }
+            }
+        }
+    }
+    
+    return nil;
+}
+
+- (JNWCollectionViewLayoutAttributes *)layoutAttributesForDropMarker {
+    return _markerAttributes;
+}
+
+- (NSUInteger)rowInSection:(JNWCollectionViewListLayoutSection *)section containingPoint:(CGPoint)point {
+    NSUInteger numberOfRows = section.numberOfRows;
+    NSUInteger low = 0;
+    NSUInteger high = (numberOfRows > 0) ? numberOfRows - 1 : 0;
+    NSUInteger mid;
+    
+    CGFloat relativeOffset = point.y - section.offset;
+    
+    while (low <= high) {
+        mid = (low + high) / 2;
+        JNWCollectionViewListLayoutRowInfo midInfo = section.rowInfo[mid];
+        
+        if (midInfo.yOffset <= relativeOffset && (midInfo.yOffset + midInfo.height) >= relativeOffset) {
+            return mid;
+        } else if (midInfo.yOffset > relativeOffset && mid > 0) {
+            high = mid - 1;
+        } else if (midInfo.yOffset < relativeOffset && mid < numberOfRows) {
+            low = mid + 1;
+        } else {
+            break;
+        }
+    }
+    
+    return NSNotFound;
+}
+
 
 @end

@@ -16,6 +16,7 @@
  CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  IN THE SOFTWARE.
  */
+// Drag and drop implementation modified from https://github.com/DarkDust/JNWCollectionView (MIT licensed)
 
 #import <Foundation/Foundation.h>
 #import "JNWCollectionViewFramework.h"
@@ -137,7 +138,21 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewScrollDirection) {
 /// The default return value is NO, for performance reasons.
 - (BOOL)shouldApplyExistingLayoutAttributesOnLayout;
 
+#pragma mark Drag and Drop
+
+/// Subclasses should return the index path for a drop operation at the specified point, or nil
+/// if the layout does not support dropping or no clear index path can be determined.
+- (JNWCollectionViewDropIndexPath *)dropIndexPathAtPoint:(NSPoint)point;
+
+/// Returns the attributes of a marker for the drop location if a drag and drop
+/// session is in progress and the layout supports markers.
+///
+/// The height of the returned frame should be 1.
+- (JNWCollectionViewLayoutAttributes *)layoutAttributesForDropMarker;
+
 @end
+
+#pragma mark JNWCollectionView Interface
 
 @interface JNWCollectionView()
 

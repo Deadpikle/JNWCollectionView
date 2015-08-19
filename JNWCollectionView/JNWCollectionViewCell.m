@@ -185,4 +185,20 @@
 	return [NSString stringWithFormat:@"<%@: %p; frame = %@; layer = <%@: %p>>", self.class, self, NSStringFromRect(self.frame), self.layer.class, self.layer];
 }
 
+#pragma mark Drag and drop
+
+- (NSImage *)draggingImageRepresentation {
+    NSSize imgSize = self.bounds.size;
+    
+    NSBitmapImageRep *bir = [self bitmapImageRepForCachingDisplayInRect:[self bounds]];
+    [bir setSize:imgSize];
+    
+    [self cacheDisplayInRect:[self bounds] toBitmapImageRep:bir];
+    
+    NSImage *image = [[NSImage alloc] initWithSize:imgSize];
+    [image addRepresentation:bir];
+    
+    return image;
+}
+
 @end
