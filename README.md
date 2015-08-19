@@ -28,7 +28,18 @@ and should also ensure that the view controller is set up properly:
 // in the implementation when you're setting up the collection view...
 self.collectionView.dragDropDelegate = self;
 ```
-The drag and drop marker is optional.
+The drag and drop marker itself is optional.
+
+You can also enable automatic scrolling of your layout during a drag + drop operation. In the layout's `dropIndexPathAtPoint:' method, call `[self scrollIfNecessaryForDragAtPoint:point];` to call the super/overridden method. The client must enable auto scroll in the view controller by doing the following:
+```objc
+JNWCollectionViewGridLayout *layout = [[JNWCollectionViewGridLayout alloc] init];
+// Set up layout
+layout.shouldAutoScroll = YES;
+// Set up scrolling threshold (can change up, down, left, and right)
+layout.downAutoScrollThreshold = 10.0f;
+// Set up scrolling amount (can change up, down, left, and right)
+layout.downAutoScrollAmount = 15.0f;
+```
 
 Things that should change to improve the drag & drop API/Demo:
 - Allow for putting the drag and drop marker in the layout (or somesuch) so that the drop marker can actually be a table row, grid cell, etc.
