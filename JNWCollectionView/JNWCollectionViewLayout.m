@@ -27,6 +27,26 @@
 
 @implementation JNWCollectionViewLayout
 
+- (instancetype)init {
+    self = [super init];
+    if (self == nil) return nil;
+    
+    self.shouldAutoScroll = NO;
+    CGFloat defaultThreshold = 25.0f;
+    self.leftAutoScrollThreshold = defaultThreshold;
+    self.rightAutoScrollThreshold = defaultThreshold;
+    self.upAutoScrollThreshold = defaultThreshold;
+    self.downAutoScrollThreshold = defaultThreshold;
+    
+    CGFloat defaultAutoScrollAmount = 10.0f;
+    self.leftAutoScrollAmount = defaultAutoScrollAmount;
+    self.rightAutoScrollAmount = defaultAutoScrollAmount;
+    self.upAutoScrollAmount = defaultAutoScrollAmount;
+    self.downAutoScrollAmount = defaultAutoScrollAmount;
+    
+    return self;
+}
+
 - (void)invalidateLayout {
 	// Forward this onto the collection view itself.
 	[self.collectionView collectionViewLayoutWasInvalidated:self];
@@ -84,6 +104,33 @@
 
 - (JNWCollectionViewLayoutAttributes *)layoutAttributesForDropMarker {
     return nil;
+}
+
+- (BOOL)scrollIfNecessaryForDragAtPoint:(CGPoint)point {
+    if (self.shouldAutoScroll && self.collectionView) {
+        CGRect bounds = self.collectionView.contentView.bounds;
+        if (CGRectContainsPoint(bounds, NSPointToCGPoint(point))) {
+            NSClipView *clipView = [self.collectionView contentView];
+            NSPoint newOrigin = [clipView bounds].origin;
+            // Now check to see if we're within the bounds of the scroll
+            if ((bounds.origin.x + bounds.size.width) - point.x < self.rightAutoScrollThreshold) {
+                // scroll right
+                newOrigin.x += _rightAutoScrollAmount;
+            } else if (point.x - bounds.origin.x < self.leftAutoScrollThreshold) {
+                // scroll left
+                newOrigin.x -= self.leftAutoScrollAmount;
+            }
+            if ((bounds.origin.y + bounds.size.height) - point.y < self.downAutoScrollThreshold) {
+                // scroll down
+                newOrigin.y += self.downAutoScrollAmount;
+            } else if (point.y - bounds.origin.y < self.upAutoScrollThreshold) {
+                // scroll up
+                newOrigin.y -= self.upAutoScrollAmount;
+            }
+            [clipView setBoundsOrigin:newOrigin];
+        }
+    }
+    return NO;
 }
 
 @end

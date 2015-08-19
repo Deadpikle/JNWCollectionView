@@ -45,6 +45,20 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewScrollDirection) {
 
 @property (nonatomic, weak, readonly) JNWCollectionView *collectionView;
 
+// shouldAutoScroll defaults to NO
+@property (setter=setAutoScroll:) BOOL shouldAutoScroll;
+// margins default to 25.0f
+@property CGFloat leftAutoScrollThreshold;
+@property CGFloat rightAutoScrollThreshold;
+@property CGFloat upAutoScrollThreshold;
+@property CGFloat downAutoScrollThreshold;
+// Scroll amounts (in pixels)
+@property CGFloat leftAutoScrollAmount;
+@property CGFloat rightAutoScrollAmount;
+@property CGFloat upAutoScrollAmount;
+@property CGFloat downAutoScrollAmount;
+
+
 /// This method is provided as a way to inform the layout that it will
 /// need to invalidate the current layout and recalculate data.
 ///
@@ -149,6 +163,11 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewScrollDirection) {
 ///
 /// The height of the returned frame should be 1.
 - (JNWCollectionViewLayoutAttributes *)layoutAttributesForDropMarker;
+
+/// Attempts to scroll the collection view up, down, left, or right depending on the given point.
+///
+/// Returns YES if the view was scrolled and NO if it was not.
+-(BOOL)scrollIfNecessaryForDragAtPoint:(CGPoint)point;
 
 @end
 

@@ -148,9 +148,9 @@ NSString * const JNWCollectionViewListLayoutFooterKind = @"JNWCollectionViewList
         CGRect frame = attributes.frame;
         frame.size.height = 1;
         attributes.frame = frame;
-        _markerAttributes = attributes;
+        self.markerAttributes = attributes;
     } else {
-        _markerAttributes = nil;
+        self.markerAttributes = nil;
     }
 }
 
@@ -286,11 +286,11 @@ NSString * const JNWCollectionViewListLayoutFooterKind = @"JNWCollectionViewList
 #pragma mark Drag and Drop
 
 - (JNWCollectionViewDropIndexPath *)dropIndexPathAtPoint:(NSPoint)point {
+    [self scrollIfNecessaryForDragAtPoint:point];
     for (JNWCollectionViewListLayoutSection *section in self.sections) {
         if (CGRectContainsPoint(section.frame, NSPointToCGPoint(point))) {
             NSUInteger index = [self rowInSection:section containingPoint:NSPointToCGPoint(point)];
             if (index == NSNotFound) {
-                // Bug?
                 return nil;
             } else {
                 NSIndexPath *testPath = [NSIndexPath jnw_indexPathForItem:index inSection:section.index];
@@ -304,12 +304,13 @@ NSString * const JNWCollectionViewListLayoutFooterKind = @"JNWCollectionViewList
             }
         }
     }
+
     
     return nil;
 }
 
 - (JNWCollectionViewLayoutAttributes *)layoutAttributesForDropMarker {
-    return _markerAttributes;
+    return self.markerAttributes;
 }
 
 - (NSUInteger)rowInSection:(JNWCollectionViewListLayoutSection *)section containingPoint:(CGPoint)point {

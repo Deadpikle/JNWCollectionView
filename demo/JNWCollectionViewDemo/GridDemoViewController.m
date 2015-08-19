@@ -28,6 +28,7 @@ static NSString * const identifier = @"CELL";
 	JNWCollectionViewGridLayout *gridLayout = [[JNWCollectionViewGridLayout alloc] init];
 	gridLayout.delegate = self;
 	gridLayout.verticalSpacing = 10.f;
+    gridLayout.shouldAutoScroll = YES;
 	
 	self.collectionView.collectionViewLayout = gridLayout;
 	self.collectionView.dataSource = self;

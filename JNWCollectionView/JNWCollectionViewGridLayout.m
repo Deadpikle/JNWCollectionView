@@ -166,9 +166,9 @@ static const CGSize JNWCollectionViewGridLayoutDefaultSize = (CGSize){ 44.f, 44.
         frame.size.height = 1;
         attributes.frame = frame;
         
-        _markerAttributes = attributes;
+        self.markerAttributes = attributes;
     } else {
-        _markerAttributes = nil;
+        self.markerAttributes = nil;
     }
 }
 
@@ -297,25 +297,20 @@ static const CGSize JNWCollectionViewGridLayoutDefaultSize = (CGSize){ 44.f, 44.
 #pragma Drag and Drop
 
 - (JNWCollectionViewDropIndexPath *)dropIndexPathAtPoint:(NSPoint)point {
-    //for (JNWCollectionViewGridLayoutSection *section in self.sections) {
-        //NSRange range = [self rowsInRect:CGRectMake(point.x, point.y, 1, 1) fromSection:section];
-        // NSLog(@"Point: %f, %f", point.x, point.y);
-        NSArray *visibleCells = [self.collectionView visibleCells];
-        for (JNWCollectionViewCell *cell in visibleCells) {
-            if (CGRectContainsPoint(cell.frame, point)) {
-                //  NSLog(@"Found it!");
-                NSIndexPath *path = [self.collectionView indexPathForCell:cell];
-                if (path)
-                    return [JNWCollectionViewDropIndexPath indexPathForItem:path.jnw_item inSection:path.jnw_section dropRelation:JNWCollectionViewDropRelationAt];
-            }
+    [self scrollIfNecessaryForDragAtPoint:point];
+    NSArray *visibleCells = [self.collectionView visibleCells];
+    for (JNWCollectionViewCell *cell in visibleCells) {
+        if (CGRectContainsPoint(cell.frame, point)) {
+            NSIndexPath *path = [self.collectionView indexPathForCell:cell];
+            if (path)
+                return [JNWCollectionViewDropIndexPath indexPathForItem:path.jnw_item inSection:path.jnw_section dropRelation:JNWCollectionViewDropRelationAt];
         }
-   // }
-    
+    }
     return nil;
 }
 
 - (JNWCollectionViewLayoutAttributes *)layoutAttributesForDropMarker {
-    return _markerAttributes;
+    return self.markerAttributes;
 }
 
 @end
