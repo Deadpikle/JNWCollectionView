@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AB15147F171511DD00871248 /* JNWCollectionView.framework in Copy Framework */ = {isa = PBXBuildFile; fileRef = AB2E9603170CB107004678DC /* JNWCollectionView.framework */; };
+		AB15147F171511DD00871248 /* JNWCollectionView.framework in Copy Framework */ = {isa = PBXBuildFile; fileRef = AB2E9603170CB107004678DC /* JNWCollectionView.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		AB29A69016FEFE1B00C9A941 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB29A68F16FEFE1B00C9A941 /* QuartzCore.framework */; };
 		AB2E9606170CB116004678DC /* JNWCollectionView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB2E9603170CB107004678DC /* JNWCollectionView.framework */; };
 		AB2E960B170CB196004678DC /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = AB2E9609170CB196004678DC /* MainMenu.xib */; };
@@ -288,7 +288,7 @@
 		ABB0F2EB16FD7D19002004F5 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0640;
 				ORGANIZATIONNAME = AppJon;
 			};
 			buildConfigurationList = ABB0F2EE16FD7D19002004F5 /* Build configuration list for PBXProject "JNWCollectionViewDemo" */;

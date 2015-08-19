@@ -82,6 +82,7 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewSelectionType) {
 @implementation JNWCollectionView
 @dynamic drawsBackground;
 @dynamic backgroundColor;
+@dynamic documentView;
 
 // We're using a static function for the common initialization so that subclassers
 // don't accidentally override this method in their own common init method.
