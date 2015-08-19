@@ -35,7 +35,7 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewSelectionType) {
 	JNWCollectionViewSelectionTypeMultiple
 };
 
-@interface JNWCollectionView() {
+@interface JNWCollectionView() <NSDraggingSource> {
 	struct {
 		unsigned int dataSourceNumberOfSections:1;
 		unsigned int dataSourceViewForSupplementaryView:1;
@@ -136,6 +136,10 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	return self;
 }
 
+-(void)dealloc {
+	[self unregisterDraggedTypes];
+}
+
 #pragma mark Delegate and data source
 
 - (void)setDelegate:(id<JNWCollectionViewDelegate>)delegate {	
@@ -166,7 +170,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 - (void)setDragDropDelegate:(id<JNWCollectionViewDragDropDelegate>)dragDropDelegate {
 	_dragDropDelegate = dragDropDelegate;
 	
-	[self unregisterDraggedTypes]; // safety measure
+	//[self unregisterDraggedTypes]; // safety measure
 	[self registerForDraggedTypes:[dragDropDelegate draggedTypesForCollectionView:self]];
 	
 	_collectionViewFlags.dragDropDelegateDropMarker = [dragDropDelegate respondsToSelector:@selector(collectionView:dropMarkerViewWithFrame:)];
@@ -1230,6 +1234,10 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		}
 		_dropMarker = markerView;
 	}
+}
+
+- (BOOL)wantsPeriodicDraggingUpdates {
+	return YES;
 }
 
 #pragma mark NSObject

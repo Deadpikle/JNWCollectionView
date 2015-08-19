@@ -173,6 +173,13 @@
 	}
 }
 
+- (void)mouseDragged:(NSEvent *)theEvent {
+    [super mouseDragged:theEvent];
+    
+    [self.collectionView mouseDraggedInCollectionViewCell:self withEvent:theEvent];
+}
+
+
 - (void)rightMouseDown:(NSEvent *)theEvent {
 	[super rightMouseDown:theEvent];
 	

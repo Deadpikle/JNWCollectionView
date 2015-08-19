@@ -153,7 +153,7 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewScrollPosition) {
 #pragma mark Reloading and customizing
 
 @class JNWCollectionViewLayout;
-@interface JNWCollectionView : JNWScrollView <NSDraggingSource>
+@interface JNWCollectionView : JNWScrollView 
 
 /// The delegate for the collection view.
 @property (nonatomic, unsafe_unretained) IBOutlet id<JNWCollectionViewDelegate> delegate;

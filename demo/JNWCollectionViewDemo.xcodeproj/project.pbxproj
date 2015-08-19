@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		34CE92C71B84CD9200920DBC /* ListMarker.m in Sources */ = {isa = PBXBuildFile; fileRef = 34CE92C61B84CD9200920DBC /* ListMarker.m */; };
 		AB15147F171511DD00871248 /* JNWCollectionView.framework in Copy Framework */ = {isa = PBXBuildFile; fileRef = AB2E9603170CB107004678DC /* JNWCollectionView.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		AB29A69016FEFE1B00C9A941 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB29A68F16FEFE1B00C9A941 /* QuartzCore.framework */; };
 		AB2E9606170CB116004678DC /* JNWCollectionView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB2E9603170CB107004678DC /* JNWCollectionView.framework */; };
@@ -72,6 +73,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		34CE92C51B84CD9200920DBC /* ListMarker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ListMarker.h; path = JNWCollectionViewDemo/ListMarker.h; sourceTree = SOURCE_ROOT; };
+		34CE92C61B84CD9200920DBC /* ListMarker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ListMarker.m; path = JNWCollectionViewDemo/ListMarker.m; sourceTree = SOURCE_ROOT; };
 		AB29A68F16FEFE1B00C9A941 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		AB2E95FD170CB107004678DC /* JNWCollectionView.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = JNWCollectionView.xcodeproj; path = ../JNWCollectionView.xcodeproj; sourceTree = "<group>"; };
 		AB2E960A170CB196004678DC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = JNWCollectionViewDemo/en.lproj/MainMenu.xib; sourceTree = SOURCE_ROOT; };
@@ -254,6 +257,8 @@
 				AB3C7233170CABFF004A91DB /* ListCell.m */,
 				AB3C7234170CABFF004A91DB /* ListHeader.h */,
 				AB3C7235170CABFF004A91DB /* ListHeader.m */,
+				34CE92C51B84CD9200920DBC /* ListMarker.h */,
+				34CE92C61B84CD9200920DBC /* ListMarker.m */,
 				ABAF156B1718F6D000658A1D /* ListDemoViewController.h */,
 				ABAF156C1718F6D000658A1D /* ListDemoViewController.m */,
 			);
@@ -357,6 +362,7 @@
 				AB3C7239170CABFF004A91DB /* ListHeader.m in Sources */,
 				AB3C7244170CAC32004A91DB /* main.m in Sources */,
 				ABAF155B1718C39C00658A1D /* JNWLabel.m in Sources */,
+				34CE92C71B84CD9200920DBC /* ListMarker.m in Sources */,
 				ABAF155C1718C39C00658A1D /* JNWLabel+Accessibility.m in Sources */,
 				ABAF15691718E67C00658A1D /* DemoWindowController.m in Sources */,
 				ABAF156D1718F6D000658A1D /* ListDemoViewController.m in Sources */,
