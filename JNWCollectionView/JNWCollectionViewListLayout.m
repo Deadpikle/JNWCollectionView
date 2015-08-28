@@ -146,7 +146,7 @@ NSString * const JNWCollectionViewListLayoutFooterKind = @"JNWCollectionViewList
         JNWCollectionViewDropIndexPath *indexPath = self.collectionView.dragContext.dropPath;
         JNWCollectionViewLayoutAttributes *attributes = [self layoutAttributesForItemAtIndexPath:indexPath];
         CGRect frame = attributes.frame;
-        frame.size.height = 1;
+        frame.size.height = 2;
         attributes.frame = frame;
         self.markerAttributes = attributes;
     } else {

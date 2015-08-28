@@ -163,7 +163,7 @@ static const CGSize JNWCollectionViewGridLayoutDefaultSize = (CGSize){ 44.f, 44.
         JNWCollectionViewDropIndexPath *indexPath = self.collectionView.dragContext.dropPath;
         JNWCollectionViewLayoutAttributes *attributes = [self layoutAttributesForItemAtIndexPath:indexPath];
         CGRect frame = attributes.frame;
-        frame.size.height = 1;
+        frame.size.width = 2;
         attributes.frame = frame;
         
         self.markerAttributes = attributes;

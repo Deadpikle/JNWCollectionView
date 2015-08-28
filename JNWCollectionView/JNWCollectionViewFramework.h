@@ -146,6 +146,8 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewScrollPosition) {
 
 /// Asks the data source to return an appropriate view for marking a drop location.
 /// The returned view may have a different frame but should somehow emphasize the specified frame.
+/// Ideally, dropMarkerViewWithFrame would know the JNWCollectionViewDropRelation so that it could draw itself differently
+/// depending on where the item should be dropped. Unfortunately, that's still a TODO:. 
 - (NSView *)collectionView:(JNWCollectionView *)collectionView dropMarkerViewWithFrame:(NSRect)frame;
 
 @end
@@ -220,13 +222,13 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewScrollPosition) {
 /// at the time. If this is a repeating pattern image, it will scroll along with the content.
 ///
 /// Defaults to a white color.
-@property (nonatomic, strong) NSColor *backgroundColor;
+@property (copy) NSColor *backgroundColor;
 
 /// Whether or not the collection view draws the background color. If the collection view
 /// background color needs to be transparent, this should be disabled.
 ///
 /// Defaults to YES.
-@property (nonatomic, assign) BOOL drawsBackground;
+@property (atomic) BOOL drawsBackground;
 
 #pragma mark - Information
 

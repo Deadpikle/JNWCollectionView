@@ -12,8 +12,22 @@
 
 @implementation ListMarker
 
+- (instancetype)init {
+    self = [super init];
+    if (self)
+        self.color = [NSColor blueColor];
+    return self;
+}
+
+- (instancetype)initWithFrame:(NSRect)frameRect {
+    self = [super initWithFrame:frameRect];
+    if (self)
+        self.color = [NSColor blueColor];
+    return self;
+}
+
 - (void)drawRect:(NSRect)dirtyRect {
-    [[NSColor blueColor] set];
+    [self.color set];
     NSRectFill(dirtyRect);
 }
 

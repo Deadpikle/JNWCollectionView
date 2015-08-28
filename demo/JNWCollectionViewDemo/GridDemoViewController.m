@@ -8,6 +8,7 @@
 
 #import "GridDemoViewController.h"
 #import "GridCell.h"
+#import "ListMarker.h"
 
 @interface GridDemoViewController() <JNWCollectionViewDragDropDelegate>
 @property (nonatomic, strong) NSMutableArray *images;
@@ -42,6 +43,14 @@ static NSString * const identifier = @"CELL";
 
 - (IBAction)updateSizeSliderValue:(id)sender {
 	[self.collectionView.collectionViewLayout invalidateLayout];
+}
+
+- (NSView *)collectionView:(JNWCollectionView *)collectionView dropMarkerViewWithFrame:(NSRect)frame {
+    frame.size.width += 2;
+    frame.origin.x -= 5;
+    ListMarker *marker = [[ListMarker alloc] initWithFrame:frame];
+    [marker setColor:[NSColor blueColor]];
+    return marker;
 }
 
 #pragma mark Data source
@@ -104,9 +113,13 @@ static NSString * const identifier = @"CELL";
     if ([dragIndexPaths count] > 0 && dropIndexPath) {
         long fromIndex = ((NSIndexPath*)dragIndexPaths[0]).jnw_item % 30;
         long toIndex = dropIndexPath.jnw_item % 30;
-        [self.images exchangeObjectAtIndex:fromIndex withObjectAtIndex:toIndex];
-        [self.collectionView reloadData];
-        return YES;
+        if (fromIndex != toIndex) {
+            NSImage *image = [self.images objectAtIndex:fromIndex];
+            [self.images removeObjectAtIndex:fromIndex];
+            [self.images insertObject:image atIndex:toIndex];
+            [self.collectionView reloadData];
+            return YES;
+        }
     }
     return NO;
 }

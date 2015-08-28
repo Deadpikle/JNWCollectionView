@@ -1222,6 +1222,8 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		JNWCollectionViewLayoutAttributes *attributes = [self.collectionViewLayout layoutAttributesForDropMarker];
 		NSView *markerView;
 		if (attributes) {
+			// Ideally, dropMarkerViewWithFrame would know the JNWCollectionViewDropRelation so that it could draw itself differently
+			// depending on where the item should be dropped.
 			markerView = [self.dragDropDelegate collectionView:self dropMarkerViewWithFrame:attributes.frame];
 			markerView.alphaValue = attributes.alpha;
 		} else {

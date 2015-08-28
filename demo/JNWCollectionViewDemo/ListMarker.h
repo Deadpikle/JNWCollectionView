@@ -11,4 +11,6 @@
 
 @interface ListMarker : NSView
 
+@property NSColor *color;
+
 @end
