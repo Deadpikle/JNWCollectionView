@@ -113,6 +113,8 @@ static NSString * const identifier = @"CELL";
     if ([dragIndexPaths count] > 0 && dropIndexPath) {
         long fromIndex = ((NSIndexPath*)dragIndexPaths[0]).jnw_item % 30;
         long toIndex = dropIndexPath.jnw_item % 30;
+        if (toIndex > fromIndex)
+            toIndex--; // moving to the right? must adjust index to be one less because the drop marker is to the left
         if (fromIndex != toIndex) {
             NSImage *image = [self.images objectAtIndex:fromIndex];
             [self.images removeObjectAtIndex:fromIndex];
