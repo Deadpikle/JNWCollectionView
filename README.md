@@ -45,7 +45,7 @@ layout.downAutoScrollAmount = 15.0f; // defaults to 10.0f
 Things that should change to improve the drag & drop API/Demo:
 - Allow for putting the drag and drop marker in the layout (or somesuch) so that the drop marker can actually be a table row, grid cell, etc.
 - Make more delegate protocol options optional instead of required (such as the pasteboard stuff -- do we really need this?)
-- Improve the grid drag & drop example (there's no drop marker, for instance)
+- Improve the grid drag & drop example by not having all the images change everywhere when you move something
 - No way to add new sections in table list (what would be a good way to do this?)
 
 ## Getting Started ##
