@@ -35,10 +35,11 @@ You can also enable automatic scrolling of your layout during a drag + drop oper
 JNWCollectionViewGridLayout *layout = [[JNWCollectionViewGridLayout alloc] init];
 // Set up layout
 layout.shouldAutoScroll = YES;
+// The following parameters are optional, but useful:
 // Set up scrolling threshold (can change up, down, left, and right)
-layout.downAutoScrollThreshold = 10.0f;
+layout.downAutoScrollThreshold = 10.0f; // defaults to 25.0f
 // Set up scrolling amount (can change up, down, left, and right)
-layout.downAutoScrollAmount = 15.0f;
+layout.downAutoScrollAmount = 15.0f; // defaults to 10.0f
 ```
 
 Things that should change to improve the drag & drop API/Demo:
