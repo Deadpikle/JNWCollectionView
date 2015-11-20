@@ -78,7 +78,7 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewSelectionType) {
 @property (nonatomic, strong) NSMutableDictionary *supplementaryViewClassMap; // { "kind/identifier" : class }
 @property (nonatomic, strong) NSMutableDictionary *supplementaryViewNibMap; // { "kind/identifier" : nib }
 
-@property (nonatomic, strong) NSView *documentView;
+@property (nonatomic, strong) NSView *collectionViewDocumentView;
 
 // Drag and drop
 @property (nonatomic, strong) NSView *dropMarker;
@@ -109,7 +109,9 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	collectionView.wantsLayer = YES;
 	
 	// Set the document view to a custom class that returns YES to -isFlipped.
-	collectionView.documentView = [[JNWCollectionViewDocumentView alloc] initWithFrame:CGRectZero];
+	JNWCollectionViewDocumentView *documentView = [[JNWCollectionViewDocumentView alloc] initWithFrame:CGRectZero];
+	collectionView.collectionViewDocumentView = documentView;
+	collectionView.documentView = documentView;
 		
 	// We don't want to perform an initial layout pass until the user has called -reloadData.
 	collectionView->_collectionViewFlags.wantsLayout = NO;

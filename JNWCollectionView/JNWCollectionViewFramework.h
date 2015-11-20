@@ -228,7 +228,7 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewScrollPosition) {
 /// background color needs to be transparent, this should be disabled.
 ///
 /// Defaults to YES.
-@property (atomic) BOOL drawsBackground;
+@property (assign) BOOL drawsBackground;
 
 #pragma mark - Information
 
