@@ -30,7 +30,7 @@ self.collectionView.dragDropDelegate = self;
 ```
 The drag and drop marker itself is optional.
 
-You can also enable automatic scrolling of your layout during a drag + drop operation. In the layout's `dropIndexPathAtPoint:' method, call `[self scrollIfNecessaryForDragAtPoint:point];` to call the super/overridden method. The client must enable auto scroll in the view controller by doing the following:
+You can also enable automatic scrolling of your layout during a drag + drop operation. In the layout's `dropIndexPathAtPoint:` method, call `[self scrollIfNecessaryForDragAtPoint:point];` to call the super/overridden method. The client must enable auto scroll in the view controller by doing the following:
 ```objc
 JNWCollectionViewGridLayout *layout = [[JNWCollectionViewGridLayout alloc] init];
 // Set up layout
