@@ -132,7 +132,7 @@ Take a look [at the header itself](https://github.com/jwilling/jnwcollectionview
 
 ## Drag and Drop (WIP) ##
 
-This fork uses the latest (as of 2015-12-20) version of `JNWCollectionView` and adds drag and drop support from https://github.com/DarkDust/JNWCollectionView. The API was mostly kept the same, but a few modifications were made. Please note that most of the drag/drop functionality really needs to be refactored to the layout as much as possible; currently, that hasn't been done yet.
+Drag and drop support and idealogies were modified from the work done at https://github.com/DarkDust/JNWCollectionView. The API was mostly kept the same, but a few modifications were made. Please note that most of the drag/drop functionality really needs to be refactored to the layout as much as possible; currently, that hasn't been done yet.
 
 To access drag and drop functionality, your view controller (or whatever is managing the `JNWCollectionView`) should implement the following:
 ```objc
