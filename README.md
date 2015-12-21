@@ -12,42 +12,6 @@ The easiest way to understand what this framework can do is to just dive in with
 
 `JNWCollectionView` requires OS X 10.8+.
 
-## Updates on this fork ##
-
-This fork uses the latest (as of 2015-11-20) version of `JNWCollectionView` and adds drag and drop support from https://github.com/DarkDust/JNWCollectionView. The API was mostly kept the same, but a few modifications were made. Please note that most of the drag/drop functionality really needs to be refactored to the layout as much as possible; currently, that hasn't been done yet.
-
-To access drag and drop functionality, your view controller (or whatever is managing the `JNWCollectionView`) should implement the following:
-```objc
-- (id<NSPasteboardWriting>)collectionView:(JNWCollectionView *)collectionView pasteboardWriterForItemAtIndexPath:(NSIndexPath *)indexPath;
-- (NSArray *)draggedTypesForCollectionView:(JNWCollectionView *)collectionView ;
-- (BOOL)collectionView:(JNWCollectionView *)collectionView performDragOperation:(id<NSDraggingInfo>)sender fromIndexPaths:(NSArray *)dragIndexPaths toIndexPath:(JNWCollectionViewDropIndexPath *)dropIndexPath;
-```
-and should also ensure that the view controller is set up properly:
-```objc
-@interface ListDemoViewController : NSViewController <..., JNWCollectionViewDragDropDelegate>
-// in the implementation when you're setting up the collection view...
-self.collectionView.dragDropDelegate = self;
-```
-The drag and drop marker itself is optional.
-
-You can also enable automatic scrolling of your layout during a drag + drop operation. In the layout's `dropIndexPathAtPoint:` method, call `[self scrollIfNecessaryForDragAtPoint:point];` to call the super/overridden method. The client must enable auto scroll in the view controller by doing the following:
-```objc
-JNWCollectionViewGridLayout *layout = [[JNWCollectionViewGridLayout alloc] init];
-// Set up layout
-layout.shouldAutoScroll = YES;
-// The following parameters are optional, but useful:
-// Set up scrolling threshold (can change up, down, left, and right)
-layout.downAutoScrollThreshold = 10.0f; // defaults to 25.0f
-// Set up scrolling amount (can change up, down, left, and right)
-layout.downAutoScrollAmount = 15.0f; // defaults to 10.0f
-```
-
-Things that should change to improve the drag & drop API/Demo:
-- Allow for putting the drag and drop marker in the layout (or somesuch) so that the drop marker can actually be a table row, grid cell, etc.
-- Make more delegate protocol options optional instead of required (such as the pasteboard stuff -- do we really need this?)
-- Improve the grid drag & drop example by not having all the images change everywhere when you move something
-- No way to add new sections in table list (what would be a good way to do this?)
-
 ## Getting Started ##
 
 `JNWCollectionView` inherits from `NSScrollView`, so it can either be instantiated through code or in Interface Builder. The following example demonstrates creating a collection view through code.
@@ -165,6 +129,42 @@ All supplementary views are built on top of `JNWCollectionViewReusableView`. See
 ### The Collection View ###
 
 Take a look [at the header itself](https://github.com/jwilling/jnwcollectionview/blob/master/JNWCollectionView/JNWCollectionViewFramework.h), as the documentation is thorough.
+
+## Drag and Drop (WIP) ##
+
+This fork uses the latest (as of 2015-12-20) version of `JNWCollectionView` and adds drag and drop support from https://github.com/DarkDust/JNWCollectionView. The API was mostly kept the same, but a few modifications were made. Please note that most of the drag/drop functionality really needs to be refactored to the layout as much as possible; currently, that hasn't been done yet.
+
+To access drag and drop functionality, your view controller (or whatever is managing the `JNWCollectionView`) should implement the following:
+```objc
+- (id<NSPasteboardWriting>)collectionView:(JNWCollectionView *)collectionView pasteboardWriterForItemAtIndexPath:(NSIndexPath *)indexPath;
+- (NSArray *)draggedTypesForCollectionView:(JNWCollectionView *)collectionView ;
+- (BOOL)collectionView:(JNWCollectionView *)collectionView performDragOperation:(id<NSDraggingInfo>)sender fromIndexPaths:(NSArray *)dragIndexPaths toIndexPath:(JNWCollectionViewDropIndexPath *)dropIndexPath;
+```
+and should also ensure that the view controller is set up properly:
+```objc
+@interface ListDemoViewController : NSViewController <..., JNWCollectionViewDragDropDelegate>
+// in the implementation when you're setting up the collection view...
+self.collectionView.dragDropDelegate = self;
+```
+The drag and drop marker itself is optional.
+
+You can also enable automatic scrolling of your layout during a drag + drop operation. In the layout's `dropIndexPathAtPoint:` method, call `[self scrollIfNecessaryForDragAtPoint:point];` to call the super/overridden method. The client must enable auto scroll in the view controller by doing the following:
+```objc
+JNWCollectionViewGridLayout *layout = [[JNWCollectionViewGridLayout alloc] init];
+// Set up layout
+layout.shouldAutoScroll = YES;
+// The following parameters are optional, but useful:
+// Setup scrolling threshold (can change up, down, left, and right)
+layout.downAutoScrollThreshold = 10.0f; // defaults to 25.0f
+// Setup scrolling amount (can change up, down, left, and right)
+layout.downAutoScrollAmount = 15.0f; // defaults to 10.0f
+```
+
+Things that should change to improve the drag & drop API/Demo:
+- Allow for putting the drag and drop marker in the layout (or somesuch) so that the drop marker can actually be a table row, grid cell, etc.
+- Make more delegate protocol options optional instead of required (such as the pasteboard stuff -- do we really need this?)
+- Improve the grid drag & drop example by not having all the images change everywhere when you move something
+- No way to add new sections in table list (what would be a good way to do this?)
 
 ## How do I add it to my project? ##
 
