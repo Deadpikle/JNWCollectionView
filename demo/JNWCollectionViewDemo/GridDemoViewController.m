@@ -35,6 +35,7 @@ static NSString * const identifier = @"CELL";
 	self.collectionView.dataSource = self;
     self.collectionView.dragDropDelegate = self;
 	self.collectionView.animatesSelection = NO; // (this is the default option)
+    //self.collectionView.allowsMultipleSelection = NO; // uncomment to only allow single selection of one item
 	
 	[self.collectionView registerClass:GridCell.class forCellWithReuseIdentifier:identifier];
 	
