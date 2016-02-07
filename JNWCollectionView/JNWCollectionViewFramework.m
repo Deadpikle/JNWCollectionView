@@ -617,8 +617,8 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 
 		// See https://github.com/jwilling/JNWCollectionView/issues/117 if you are having issues with resizing
 		// window frames and lag
-		//[self performFullRelayoutForcingSubviewsReset:NO];
-		[self performFullRelayoutForcingSubviewsReset:shouldInvalidate];
+		[self performFullRelayoutForcingSubviewsReset:NO];
+		//[self performFullRelayoutForcingSubviewsReset:shouldInvalidate];
 	}
 }
 
@@ -1114,7 +1114,9 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 }
 
 - (void)selectAll:(id)sender {
-	[self selectItemsAtIndexPaths:[self allIndexPaths] animated:YES];
+	if (self.allowsMultipleSelection) {
+		[self selectItemsAtIndexPaths:[self allIndexPaths] animated:YES];
+	}
 }
 
 - (void)deselectAllItems {
