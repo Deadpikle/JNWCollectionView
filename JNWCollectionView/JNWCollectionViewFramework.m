@@ -120,6 +120,8 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	
 	collectionView.allowsEmptySelection = YES;
 	
+	collectionView.allowsMultipleSelection = YES;
+	
 	collectionView.backgroundColor = NSColor.whiteColor;
 	collectionView.drawsBackground = YES;
 }
@@ -613,7 +615,10 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		BOOL shouldInvalidate = [self.collectionViewLayout shouldInvalidateLayoutForBoundsChange:visibleBounds];
 		[self.data recalculateAndPrepareLayout:shouldInvalidate];
 
-		[self performFullRelayoutForcingSubviewsReset:shouldInvalidate];
+		// See https://github.com/jwilling/JNWCollectionView/issues/117 if you are having issues with resizing
+		// window frames and lag
+		[self performFullRelayoutForcingSubviewsReset:NO];
+		//[self performFullRelayoutForcingSubviewsReset:shouldInvalidate];
 	}
 }
 
@@ -970,6 +975,8 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 			   selectionType:(JNWCollectionViewSelectionType)selectionType {
 	if (indexPath == nil)
 		return;
+	if ((!self.allowsMultipleSelection && selectionType != JNWCollectionViewSelectionTypeSingle))
+		return;
     
 	NSMutableSet *indexesToSelect = [NSMutableSet set];
 	
@@ -1031,11 +1038,17 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	
 	// Detect if modifier flags are held down.
 	// We prioritize the command key over the shift key.
-	if (event.modifierFlags & NSCommandKeyMask) {
-		[self selectItemAtIndexPath:indexPath atScrollPosition:JNWCollectionViewScrollPositionNearest animated:YES selectionType:JNWCollectionViewSelectionTypeMultiple];
-	} else if (event.modifierFlags & NSShiftKeyMask) {
-		[self selectItemAtIndexPath:indexPath atScrollPosition:JNWCollectionViewScrollPositionNearest animated:YES selectionType:JNWCollectionViewSelectionTypeExtending];
-	} else {
+	BOOL isSingleSelect = YES;
+	if (self.allowsMultipleSelection) {
+		if (event.modifierFlags & NSCommandKeyMask) {
+			[self selectItemAtIndexPath:indexPath atScrollPosition:JNWCollectionViewScrollPositionNearest animated:YES selectionType:JNWCollectionViewSelectionTypeMultiple];
+			isSingleSelect = NO;
+		} else if (event.modifierFlags & NSShiftKeyMask) {
+			[self selectItemAtIndexPath:indexPath atScrollPosition:JNWCollectionViewScrollPositionNearest animated:YES selectionType:JNWCollectionViewSelectionTypeExtending];
+			isSingleSelect = NO;
+		}
+	}
+	if (isSingleSelect) {
 		[self selectItemAtIndexPath:indexPath atScrollPosition:JNWCollectionViewScrollPositionNearest animated:YES];
 	}
 }
@@ -1101,7 +1114,9 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 }
 
 - (void)selectAll:(id)sender {
-	[self selectItemsAtIndexPaths:[self allIndexPaths] animated:YES];
+	if (self.allowsMultipleSelection) {
+		[self selectItemsAtIndexPaths:[self allIndexPaths] animated:YES];
+	}
 }
 
 - (void)deselectAllItems {
