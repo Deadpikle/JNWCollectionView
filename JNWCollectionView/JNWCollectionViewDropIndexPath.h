@@ -38,6 +38,9 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewDropRelation) {
     // If the item number is the last one in the section, the intent is to add a
     // new section after the current section (if the layout and data support
     // multiple sections).
+    // NOTE 2016-02-14: Currently, JNWCollectionViewDropRelationAfter is used to
+    // allow for adding after an item in an already-existing section, not for
+    // creating a new section. TODO:.
     JNWCollectionViewDropRelationAfter = 1,
 };
 
