@@ -147,6 +147,9 @@ NSString * const JNWCollectionViewListLayoutFooterKind = @"JNWCollectionViewList
         JNWCollectionViewLayoutAttributes *attributes = [self layoutAttributesForItemAtIndexPath:indexPath];
         CGRect frame = attributes.frame;
         frame.size.height = 2;
+        if (indexPath.jnw_relation == JNWCollectionViewDropRelationAfter) {
+            frame.origin.y += self.rowHeight + 2; // + 2 accounts for the frame height
+        }
         attributes.frame = frame;
         self.markerAttributes = attributes;
     } else {
@@ -287,6 +290,7 @@ NSString * const JNWCollectionViewListLayoutFooterKind = @"JNWCollectionViewList
 
 - (JNWCollectionViewDropIndexPath *)dropIndexPathAtPoint:(NSPoint)point {
     [self scrollIfNecessaryForDragAtPoint:point];
+    /*
     for (JNWCollectionViewListLayoutSection *section in self.sections) {
         if (CGRectContainsPoint(section.frame, NSPointToCGPoint(point))) {
             NSUInteger index = [self rowInSection:section containingPoint:NSPointToCGPoint(point)];
@@ -297,14 +301,28 @@ NSString * const JNWCollectionViewListLayoutFooterKind = @"JNWCollectionViewList
                 if ([self.collectionView.dragContext.dragPaths containsObject:testPath]) {
                     // Don't drop on a dragged item.
                     return nil;
-                }
-                else {
+                } else {
+                    
                     return [JNWCollectionViewDropIndexPath indexPathForItem:index inSection:section.index dropRelation:JNWCollectionViewDropRelationAt];
                 }
             }
         }
     }
-
+     */
+    
+    NSArray *visibleCells = [self.collectionView visibleCells];
+    for (JNWCollectionViewCell *cell in visibleCells) {
+        if (CGRectContainsPoint(cell.frame, point)) {
+            NSIndexPath *path = [self.collectionView indexPathForCell:cell];
+            if (path) {
+                if (point.y <= cell.frame.origin.y + cell.frame.size.height * 0.5) {
+                    return [JNWCollectionViewDropIndexPath indexPathForItem:path.jnw_item inSection:path.jnw_section dropRelation:JNWCollectionViewDropRelationAt];
+                } else {
+                    return [JNWCollectionViewDropIndexPath indexPathForItem:path.jnw_item inSection:path.jnw_section dropRelation:JNWCollectionViewDropRelationAfter];
+                }
+            }
+        }
+    }
     
     return nil;
 }

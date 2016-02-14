@@ -111,24 +111,29 @@ static NSString * const headerIdentifier = @"HEADER";
         }
     } else {
         // Dragged a row.
-        // TODO: This doesn't work correctly with multiple rows.
+        // TODO: This doesn't work correctly with multiple rows. It just needs more complex move logic.
         for (NSIndexPath *fromPath in dragIndexPaths) {
             NSMutableArray *fromSectionArray = [_sections objectAtIndex:fromPath.jnw_section];
+            long fromIndex = fromPath.jnw_item;
+            long toIndex = dropIndexPath.jnw_item;
+            // moving to the right? must adjust index to be one less because we erase an item before inserting an item.
+            long finalDesination = toIndex;
             if (fromSectionArray == toSectionArray) {
-                // Move within a section.
-                id object = [toSectionArray objectAtIndex:fromPath.jnw_item];
-                if (fromPath.jnw_item < dropIndexPath.jnw_item) {
-                    [toSectionArray insertObject:object atIndex:dropIndexPath.jnw_item];
-                    [toSectionArray removeObjectAtIndex:fromPath.jnw_item];
-                } else {
-                    [toSectionArray removeObjectAtIndex:fromPath.jnw_item];
-                    [toSectionArray insertObject:object atIndex:dropIndexPath.jnw_item];
+                if (toIndex > fromIndex && dropIndexPath.jnw_relation != JNWCollectionViewDropRelationAfter) {
+                    finalDesination = toIndex - 1;
                 }
+                // Move within a section.
+                id object = [toSectionArray objectAtIndex:fromIndex];
+                [toSectionArray removeObjectAtIndex:fromIndex];
+                [toSectionArray insertObject:object atIndex:finalDesination];
             } else {
                 // Move between sections.
-                id object = [fromSectionArray objectAtIndex:fromPath.jnw_item];
-                [toSectionArray insertObject:object atIndex:dropIndexPath.jnw_item];
-                [fromSectionArray removeObjectAtIndex:fromPath.jnw_item];
+                id object = [fromSectionArray objectAtIndex:fromIndex];
+                if (dropIndexPath.jnw_relation == JNWCollectionViewDropRelationAfter) {
+                    finalDesination = toIndex + 1;
+                }
+                [toSectionArray insertObject:object atIndex:finalDesination];
+                [fromSectionArray removeObjectAtIndex:fromIndex];
             }
         }
         [_collectionView reloadData];

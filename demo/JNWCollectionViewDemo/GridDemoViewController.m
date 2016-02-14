@@ -112,6 +112,7 @@ static NSString * const identifier = @"CELL";
 
 - (BOOL)collectionView:(JNWCollectionView *)collectionView performDragOperation:(id<NSDraggingInfo>)sender fromIndexPaths:(NSArray *)dragIndexPaths toIndexPath:(JNWCollectionViewDropIndexPath *)dropIndexPath {
     if ([dragIndexPaths count] > 0 && dropIndexPath) {
+        // TODO: update demo to allow for multiple item movement
         long fromIndex = ((NSIndexPath*)dragIndexPaths[0]).jnw_item % 30;
         long toIndex = dropIndexPath.jnw_item % 30;
         // moving to the right? must adjust index to be one less because we erase an item before inserting an item.
