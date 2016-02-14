@@ -163,9 +163,11 @@ static const CGSize JNWCollectionViewGridLayoutDefaultSize = (CGSize){ 44.f, 44.
         JNWCollectionViewDropIndexPath *indexPath = self.collectionView.dragContext.dropPath;
         JNWCollectionViewLayoutAttributes *attributes = [self layoutAttributesForItemAtIndexPath:indexPath];
         CGRect frame = attributes.frame;
+        if (indexPath.jnw_relation == JNWCollectionViewDropRelationAfter) {
+            frame.origin.x += self.itemSize.width + 2; // make it appear "after" the dragged-over item (+2 accounts for width)
+        }
         frame.size.width = 2;
         attributes.frame = frame;
-        
         self.markerAttributes = attributes;
     } else {
         self.markerAttributes = nil;
@@ -302,8 +304,13 @@ static const CGSize JNWCollectionViewGridLayoutDefaultSize = (CGSize){ 44.f, 44.
     for (JNWCollectionViewCell *cell in visibleCells) {
         if (CGRectContainsPoint(cell.frame, point)) {
             NSIndexPath *path = [self.collectionView indexPathForCell:cell];
-            if (path)
-                return [JNWCollectionViewDropIndexPath indexPathForItem:path.jnw_item inSection:path.jnw_section dropRelation:JNWCollectionViewDropRelationAt];
+            if (path) {
+                if (point.x <= cell.frame.origin.x + cell.frame.size.width * 0.5) {
+                    return [JNWCollectionViewDropIndexPath indexPathForItem:path.jnw_item inSection:path.jnw_section dropRelation:JNWCollectionViewDropRelationAt];
+                } else {
+                    return [JNWCollectionViewDropIndexPath indexPathForItem:path.jnw_item inSection:path.jnw_section dropRelation:JNWCollectionViewDropRelationAfter];
+                }
+            }
         }
     }
     return nil;
