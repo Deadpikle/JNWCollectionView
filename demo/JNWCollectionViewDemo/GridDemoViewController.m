@@ -10,7 +10,7 @@
 #import "GridCell.h"
 #import "ListMarker.h"
 
-@interface GridDemoViewController() <JNWCollectionViewDragDropDelegate>
+@interface GridDemoViewController() <JNWCollectionViewDelegate, JNWCollectionViewDragDropDelegate>
 @property (nonatomic, strong) NSMutableArray *images;
 @property (nonatomic, strong) IBOutlet NSSlider *sizeSlider;
 @end
@@ -32,10 +32,12 @@ static NSString * const identifier = @"CELL";
     gridLayout.shouldAutoScroll = YES;
 	
 	self.collectionView.collectionViewLayout = gridLayout;
+    self.collectionView.delegate = self;
 	self.collectionView.dataSource = self;
     self.collectionView.dragDropDelegate = self;
 	self.collectionView.animatesSelection = NO; // (this is the default option)
     //self.collectionView.allowsMultipleSelection = NO; // uncomment to only allow single selection of one item
+    self.collectionView.sendsMultipleSelectionCalls = NO;
 	
 	[self.collectionView registerClass:GridCell.class forCellWithReuseIdentifier:identifier];
 	
@@ -52,6 +54,12 @@ static NSString * const identifier = @"CELL";
     ListMarker *marker = [[ListMarker alloc] initWithFrame:frame];
     [marker setColor:[NSColor blueColor]];
     return marker;
+}
+
+#pragma mark JNWCollectionView Delegate
+
+- (void)collectionView:(JNWCollectionView *)collectionView selectedItemsChangedToIndexPaths:(NSSet<NSIndexPath *> *)indexPaths {
+    //NSLog(@"%ld items are selected", [collectionView.indexPathsForSelectedItems count]); // this count is always accurate
 }
 
 #pragma mark Data source

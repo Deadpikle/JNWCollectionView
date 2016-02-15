@@ -98,11 +98,20 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewScrollPosition) {
 /// Tells the delegate that the item at the specified index path has been selected.
 - (void)collectionView:(JNWCollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath;
 
+/// Tells the delegate that the item(s) at the specified index path have been selected.
+- (void)collectionView:(JNWCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths;
+
 /// Asks the delegate if the item at the specified index path should be deselected.
 - (BOOL)collectionView:(JNWCollectionView *)collectionView shouldDeselectItemAtIndexPath:(NSIndexPath *)indexPath;
 
 /// Tells the delegate that the item at the specified index path has been deselected.
 - (void)collectionView:(JNWCollectionView *)collectionView didDeselectItemAtIndexPath:(NSIndexPath *)indexPath;
+
+/// Tells the delegate that the item(s) at the specified index path have been deselected.
+- (void)collectionView:(JNWCollectionView *)collectionView didDeselectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths;
+
+/// Tells the delegate that the number of selected items have changed to the given index path(s).
+- (void)collectionView:(JNWCollectionView *)collectionView selectedItemsChangedToIndexPaths:(NSSet<NSIndexPath *> *)indexPaths;
 
 /// Tells the delegate that the item at the specified index path has been double-clicked.
 - (void)collectionView:(JNWCollectionView *)collectionView didDoubleClickItemAtIndexPath:(NSIndexPath *)indexPath;
@@ -229,6 +238,19 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewScrollPosition) {
 ///
 /// Defaults to YES.
 @property (assign) BOOL drawsBackground;
+
+/// When the user selects more than one item at once (such as via the command key or shift key), the delegate method(s)
+/// for didSelect/didDeselect are called multiple times, one for each item. This can be problematic if the user needs
+/// an accurate count for indexPathsForSelectedItems when didSelect/didDeselect is called, as the user does not know when the last
+/// delegate callback has been made.
+/// If this property is set to NO, instead of performing multiple calls, the JNWCollectionView will make one (single)
+/// callback to the client to the delegate method(s) didSelectItems/didDeselectItems. When the didDeselectItems
+/// callback has been made, the indexPathsForSelectedItems will have an accurate count.
+/// If you want to have an accurate count after all selection changes have occurred and do not care about selection/deselection,
+/// use the collectionView:selectedItemsChangedToIndexPaths delegate method.
+/// Note that when this property is set to NO, the methods for single selection/deselection will not be called.
+/// This option defaults to YES for legacy applications.
+@property (assign) BOOL sendsMultipleSelectionCalls;
 
 #pragma mark - Information
 

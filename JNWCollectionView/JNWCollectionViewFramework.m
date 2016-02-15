@@ -44,8 +44,11 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewSelectionType) {
 		unsigned int delegateMouseUp:1;
 		unsigned int delegateShouldSelect:1;
 		unsigned int delegateDidSelect:1;
+		unsigned int delegateDidSelectMult:1;
 		unsigned int delegateShouldDeselect:1;
 		unsigned int delegateDidDeselect:1;
+		unsigned int delegateDidDeselectMult:1;
+		unsigned int delegateDidSelectItemsChange:1;
 		unsigned int delegateShouldScroll:1;
 		unsigned int delegateDidScroll:1;
 		unsigned int delegateDidDoubleClick:1;
@@ -122,6 +125,8 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	
 	collectionView.allowsMultipleSelection = YES;
 	
+	collectionView.sendsMultipleSelectionCalls = YES;
+	
 	collectionView.backgroundColor = NSColor.whiteColor;
 	collectionView.drawsBackground = YES;
 }
@@ -152,8 +157,11 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	_collectionViewFlags.delegateMouseDown = [delegate respondsToSelector:@selector(collectionView:mouseDownInItemAtIndexPath:)];
 	_collectionViewFlags.delegateShouldSelect = [delegate respondsToSelector:@selector(collectionView:shouldSelectItemAtIndexPath:)];
 	_collectionViewFlags.delegateDidSelect = [delegate respondsToSelector:@selector(collectionView:didSelectItemAtIndexPath:)];
+	_collectionViewFlags.delegateDidSelectMult = [delegate respondsToSelector:@selector(collectionView:didSelectItemsAtIndexPaths:)];
 	_collectionViewFlags.delegateShouldDeselect = [delegate respondsToSelector:@selector(collectionView:shouldDeselectItemAtIndexPath:)];
 	_collectionViewFlags.delegateDidDeselect = [delegate respondsToSelector:@selector(collectionView:didDeselectItemAtIndexPath:)];
+	_collectionViewFlags.delegateDidDeselectMult = [delegate respondsToSelector:@selector(collectionView:didDeselectItemsAtIndexPaths:)];
+	_collectionViewFlags.delegateDidSelectItemsChange = [delegate respondsToSelector:@selector(collectionView:selectedItemsChangedToIndexPaths:)];
 	_collectionViewFlags.delegateDidDoubleClick = [delegate respondsToSelector:@selector(collectionView:didDoubleClickItemAtIndexPath:)];
 	_collectionViewFlags.delegateDidRightClick = [delegate respondsToSelector:@selector(collectionView:didRightClickItemAtIndexPath:)];
     _collectionViewFlags.delegateDidEndDisplayingCell = [delegate respondsToSelector:@selector(collectionView:didEndDisplayingCell:forItemAtIndexPath:)];
@@ -348,7 +356,13 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	// Select the first item if empty selection is not allowed
 	if (!self.allowsEmptySelection) {
 		NSIndexPath *indexPath = [self indexPathForNextSelectableItemAfterIndexPath:nil];
-		[self selectItemAtIndexPath:indexPath animated:NO];
+		[self selectItemAtIndexPath:indexPath animated:NO sendDelegateMessage:self.sendsMultipleSelectionCalls];
+		if (!self.sendsMultipleSelectionCalls && _collectionViewFlags.delegateDidSelectMult) {
+			[self.delegate collectionView:self didSelectItemsAtIndexPaths:[NSSet setWithArray:@[indexPath]]];
+		}
+		if (_collectionViewFlags.delegateDidSelectItemsChange) {
+			[self.delegate collectionView:self selectedItemsChangedToIndexPaths:[NSSet setWithArray:self.selectedIndexes]];
+		}
 	}
 }
 
@@ -893,17 +907,23 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 
 - (void)deselectItemsAtIndexPaths:(NSArray *)indexPaths animated:(BOOL)animated {
 	for (NSIndexPath *indexPath in indexPaths) {
-		[self deselectItemAtIndexPath:indexPath animated:animated];
+		[self deselectItemAtIndexPath:indexPath animated:animated sendDelegateMessage:self.sendsMultipleSelectionCalls];
+	}
+	if (!self.sendsMultipleSelectionCalls && _collectionViewFlags.delegateDidDeselectMult) {
+		[self.delegate collectionView:self didDeselectItemsAtIndexPaths:[NSSet setWithArray:indexPaths]];
 	}
 }
 
 - (void)selectItemsAtIndexPaths:(NSArray *)indexPaths animated:(BOOL)animated {
 	for (NSIndexPath *indexPath in indexPaths) {
-		[self selectItemAtIndexPath:indexPath animated:animated];
+		[self selectItemAtIndexPath:indexPath animated:animated sendDelegateMessage:self.sendsMultipleSelectionCalls];
+	}
+	if (!self.sendsMultipleSelectionCalls && _collectionViewFlags.delegateDidSelectMult) {
+		[self.delegate collectionView:self didSelectItemsAtIndexPaths:[NSSet setWithArray:indexPaths]];
 	}
 }
 
-- (void)deselectItemAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated {
+- (void)deselectItemAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated sendDelegateMessage:(BOOL)shouldSendDelegateMessage {
 	if (!self.allowsSelection ||
 		(_collectionViewFlags.delegateShouldDeselect && ![self.delegate collectionView:self shouldDeselectItemAtIndexPath:indexPath]) ||
 		(!self.allowsEmptySelection && self.indexPathsForSelectedItems.count <= 1)) {
@@ -914,12 +934,12 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	[cell setSelected:NO animated:self.animatesSelection];
 	[self.selectedIndexes removeObject:indexPath];
 	
-	if (_collectionViewFlags.delegateDidDeselect) {
+	if (shouldSendDelegateMessage && _collectionViewFlags.delegateDidDeselect) {
 		[self.delegate collectionView:self didDeselectItemAtIndexPath:indexPath];
 	}
 }
 
-- (void)selectItemAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated {
+- (void)selectItemAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated sendDelegateMessage:(BOOL)shouldSendDelegateMessage {
 	if (!self.allowsSelection ||
 		(_collectionViewFlags.delegateShouldSelect && ![self.delegate collectionView:self shouldSelectItemAtIndexPath:indexPath])) {
 		return;
@@ -931,7 +951,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	if (![self.selectedIndexes containsObject:indexPath])
 		[self.selectedIndexes addObject:indexPath];
 	
-	if (_collectionViewFlags.delegateDidSelect) {
+	if (shouldSendDelegateMessage && _collectionViewFlags.delegateDidSelect) {
 		[self.delegate collectionView:self didSelectItemAtIndexPath:indexPath];
 	}
 }
@@ -1021,6 +1041,9 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	
 	[self selectItemsAtIndexPaths:indexesToSelect.allObjects animated:animated];
 	[self deselectItemsAtIndexPaths:indexesToDeselect.allObjects animated:animated];
+	if (_collectionViewFlags.delegateDidSelectItemsChange) {
+		[self.delegate collectionView:self selectedItemsChangedToIndexPaths:[NSSet setWithArray:self.selectedIndexes]];
+	}
 	[self scrollToItemAtIndexPath:indexPath atScrollPosition:scrollPosition animated:animated];
 }
 
@@ -1116,11 +1139,17 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 - (void)selectAll:(id)sender {
 	if (self.allowsMultipleSelection) {
 		[self selectItemsAtIndexPaths:[self allIndexPaths] animated:YES];
+		if (_collectionViewFlags.delegateDidSelectItemsChange) {
+			[self.delegate collectionView:self selectedItemsChangedToIndexPaths:[NSSet setWithArray:self.selectedIndexes]];
+		}
 	}
 }
 
 - (void)deselectAllItems {
 	[self deselectItemsAtIndexPaths:[self allIndexPaths] animated:YES];
+	if (_collectionViewFlags.delegateDidSelectItemsChange) {
+		[self.delegate collectionView:self selectedItemsChangedToIndexPaths:[NSSet setWithArray:self.selectedIndexes]];
+	}
 }
 
 - (void)selectAllItems {
