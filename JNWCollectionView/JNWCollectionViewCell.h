@@ -38,6 +38,10 @@
 /// effects to the selection process.
 @property (nonatomic, assign) BOOL selected;
 
+/// Sets the hovering state with no animation. Subclassers should override this method to add side
+/// effects to the hovering process.
+@property (nonatomic, assign) BOOL hovered;
+
 /// Calls -setSelected:, animating any changes to the content of the background view, such as
 /// settting the background iamge or color.
 - (void)setSelected:(BOOL)selected animated:(BOOL)animate;
@@ -48,7 +52,7 @@
 /// Alternatively, a custom content view can be set for a flatter heirarchy. Note that
 /// any custom content views will have autoresizing masks applied to them, and the view
 /// will be layer-backed.
-@property (nonatomic, strong) NSView *contentView;
+@property (nonatomic, strong) IBOutlet NSView *contentView;
 
 /// Sets the background image or background color on a dedicated background view that
 /// is always beneath the content view.
@@ -72,5 +76,8 @@
 
 /// Called when the cell will be layed out using the provided frame.
 - (void)willLayoutWithFrame:(CGRect)frame;
+
+/// Called when the cell has been laid out using the provided frame.
+- (void)didLayoutWithFrame:(CGRect)frame;
 
 @end
