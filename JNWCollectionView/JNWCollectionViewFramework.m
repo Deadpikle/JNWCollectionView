@@ -61,6 +61,8 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewSelectionType) {
 		unsigned int delegateDidRightClick:1;
 		unsigned int delegateDidEndDisplayingCell:1;
 		unsigned int delegateMenuForEvent:1;
+        
+        unsigned int delegateObjectValueForCell:1;
 		
 		unsigned int dragDropDelegateDropMarker:1;
 		
@@ -136,6 +138,8 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	
 	collectionView.backgroundColor = NSColor.whiteColor;
 	collectionView.drawsBackground = YES;
+    
+    
 }
 
 - (id)initWithFrame:(NSRect)frameRect {
@@ -181,6 +185,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	_collectionViewFlags.delegateShouldScroll = [delegate respondsToSelector:@selector(collectionView:shouldScrollToItemAtIndexPath:)];
 	_collectionViewFlags.delegateDidScroll = [delegate respondsToSelector:@selector(collectionView:didScrollToItemAtIndexPath:)];
 	_collectionViewFlags.delegateMenuForEvent = [delegate respondsToSelector:@selector(collectionView:menuForEvent:)];
+    _collectionViewFlags.delegateObjectValueForCell = [delegate respondsToSelector:@selector(collectionView:objectValueForItemAtIndexPath:)];
 }
 
 - (void)setDataSource:(id<JNWCollectionViewDataSource>)dataSource {
@@ -764,7 +769,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		JNWCollectionViewCell *cell = [self cellForItemAtIndexPath:indexPath];
 		[self.visibleCellsMap removeObjectForKey:indexPath];
 		[self enqueueReusableCell:cell withIdentifier:cell.reuseIdentifier];
-		
+        cell.objectValue = nil; // clear objectValue when cells are re-used
 		[cell setHidden:YES];
 
 		if (_collectionViewFlags.delegateDidEndDisplayingCell) {
@@ -804,7 +809,11 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 			cell.selected = YES;
 		else
 			cell.selected = NO;
-		
+        
+        if (_collectionViewFlags.delegateObjectValueForCell) {
+            cell.objectValue = [self.delegate collectionView:self objectValueForItemAtIndexPath:indexPath];
+        }
+        
 		self.visibleCellsMap[indexPath] = cell;
 	}
 }
