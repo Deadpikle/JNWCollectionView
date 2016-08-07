@@ -1143,22 +1143,6 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		[self.delegate collectionView:self mouseUpInItemAtIndexPath:indexPath];
 #pragma clang diagnostic pop
 	}
-
-	// Detect if modifier flags are held down.
-	// We prioritize the command key over the shift key.
-	BOOL isSingleSelect = YES;
-	if (self.allowsMultipleSelection) {
-		if (event.modifierFlags & NSCommandKeyMask) {
-			[self selectItemAtIndexPath:indexPath atScrollPosition:JNWCollectionViewScrollPositionNearest animated:YES selectionType:JNWCollectionViewSelectionTypeMultiple];
-			isSingleSelect = NO;
-		} else if (event.modifierFlags & NSShiftKeyMask) {
-			[self selectItemAtIndexPath:indexPath atScrollPosition:JNWCollectionViewScrollPositionNearest animated:YES selectionType:JNWCollectionViewSelectionTypeExtending];
-			isSingleSelect = NO;
-		}
-	}
-	if (isSingleSelect) {
-		[self selectItemAtIndexPath:indexPath atScrollPosition:JNWCollectionViewScrollPositionNearest animated:YES];
-	}
 }
 
 - (void)mouseMovedInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event {
