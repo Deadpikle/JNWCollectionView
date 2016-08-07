@@ -63,6 +63,7 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewSelectionType) {
 		unsigned int delegateMenuForEvent:1;
 		unsigned int delegateObjectValueForCell:1;
 		
+		unsigned int dragDropDelegateAllowsDragDrop:1;
 		unsigned int dragDropDelegateDropMarker:1;
 		
 		unsigned int wantsLayout;
@@ -202,6 +203,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	[self registerForDraggedTypes:[dragDropDelegate draggedTypesForCollectionView:self]];
 	
 	_collectionViewFlags.dragDropDelegateDropMarker = [dragDropDelegate respondsToSelector:@selector(collectionView:dropMarkerViewWithFrame:)];
+	_collectionViewFlags.dragDropDelegateAllowsDragDrop = [dragDropDelegate respondsToSelector:@selector(collectionView:shouldAllowDragDropForIndices:)];
 }
 
 
@@ -1168,22 +1170,6 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		[self.delegate collectionView:self mouseUpInItemAtIndexPath:indexPath];
 #pragma clang diagnostic pop
 	}
-
-	// Detect if modifier flags are held down.
-	// We prioritize the command key over the shift key.
-	BOOL isSingleSelect = YES;
-	if (self.allowsMultipleSelection) {
-		if (event.modifierFlags & NSCommandKeyMask) {
-			[self selectItemAtIndexPath:indexPath atScrollPosition:JNWCollectionViewScrollPositionNearest animated:YES selectionType:JNWCollectionViewSelectionTypeMultiple];
-			isSingleSelect = NO;
-		} else if (event.modifierFlags & NSShiftKeyMask) {
-			[self selectItemAtIndexPath:indexPath atScrollPosition:JNWCollectionViewScrollPositionNearest animated:YES selectionType:JNWCollectionViewSelectionTypeExtending];
-			isSingleSelect = NO;
-		}
-	}
-	if (isSingleSelect) {
-		[self selectItemAtIndexPath:indexPath atScrollPosition:JNWCollectionViewScrollPositionNearest animated:YES];
-	}
 }
 
 - (void)mouseMovedInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event {
@@ -1312,7 +1298,9 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
     }
 	if (self.dragDropDelegate) {
 		NSMutableArray *dragItems = [NSMutableArray arrayWithCapacity:self.selectedIndexes.count];
-		
+		if (_collectionViewFlags.dragDropDelegateAllowsDragDrop && ![self.dragDropDelegate collectionView:self shouldAllowDragDropForIndices:self.selectedIndexes]) {
+			return;
+		}
 		for (NSIndexPath *indexPath in self.selectedIndexes) {
 			id<NSPasteboardWriting> pasteboardWriter = [self.dragDropDelegate collectionView:self pasteboardWriterForItemAtIndexPath:indexPath];
 			if (pasteboardWriter == nil) {

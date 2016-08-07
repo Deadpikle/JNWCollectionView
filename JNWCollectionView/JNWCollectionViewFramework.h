@@ -179,6 +179,8 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewScrollPosition) {
 
 @optional
 
+- (BOOL)collectionView:(JNWCollectionView *)collectionView shouldAllowDragDropForIndices:(NSArray *)dragIndexPaths;
+
 /// Asks the data source to return an appropriate view for marking a drop location.
 /// The returned view may have a different frame but should somehow emphasize the specified frame.
 /// Ideally, dropMarkerViewWithFrame would know the JNWCollectionViewDropRelation so that it could draw itself differently
