@@ -181,7 +181,9 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewScrollPosition) {
 /// The returned view may have a different frame but should somehow emphasize the specified frame.
 /// Ideally, dropMarkerViewWithFrame would know the JNWCollectionViewDropRelation so that it could draw itself differently
 /// depending on where the item should be dropped. Unfortunately, that's still a TODO:. 
-- (NSView *)collectionView:(JNWCollectionView *)collectionView dropMarkerViewWithFrame:(NSRect)frame;
+- (NSView *)collectionView:(JNWCollectionView *)collectionView dropMarkerViewWithFrame:(NSRect)frame forIndexPath:(JNWCollectionViewDropIndexPath*)indexPath;
+
+- (NSView *)collectionView:(JNWCollectionView *)collectionView dropMarkerViewWithFrame:(NSRect)frame __deprecated_msg("Use collectionView:dropMarkerViewWithFrame:forIndexPath: instead.");
 
 @end
 

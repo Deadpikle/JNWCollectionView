@@ -147,7 +147,17 @@ NSString * const JNWCollectionViewListLayoutFooterKind = @"JNWCollectionViewList
         JNWCollectionViewLayoutAttributes *attributes = [self layoutAttributesForItemAtIndexPath:indexPath];
         CGRect frame = attributes.frame;
         if (indexPath.jnw_relation == JNWCollectionViewDropRelationAfter) {
-			frame.origin.y += frame.size.height + self.verticalSpacing;
+			frame.origin.y += frame.size.height;
+			NSInteger numberOfRowsForFinalSection = [collectionView numberOfItemsInSection:self.sections.count - 1];
+			// If not dragging to the very last item in the very last section, account for vertical spacing
+			if (indexPath.jnw_section != self.sections.count - 1 || indexPath.jnw_item != numberOfRowsForFinalSection - 1) {
+				frame.origin.y += (self.verticalSpacing / 2);
+			}
+		}
+		else {
+			// If not dragging to before the first item, take out vertical spacing
+			if (indexPath.jnw_section != 0 || indexPath.jnw_item != 0)
+				frame.origin.y -= (self.verticalSpacing / 2);
 		}
 		frame.size.height = 2;
         attributes.frame = frame;
