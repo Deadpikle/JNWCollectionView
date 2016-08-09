@@ -146,10 +146,10 @@ NSString * const JNWCollectionViewListLayoutFooterKind = @"JNWCollectionViewList
         JNWCollectionViewDropIndexPath *indexPath = self.collectionView.dragContext.dropPath;
         JNWCollectionViewLayoutAttributes *attributes = [self layoutAttributesForItemAtIndexPath:indexPath];
         CGRect frame = attributes.frame;
-        frame.size.height = 2;
         if (indexPath.jnw_relation == JNWCollectionViewDropRelationAfter) {
-            frame.origin.y += self.rowHeight + 2; // + 2 accounts for the frame height
-        }
+            frame.origin.y += frame.size.height;
+		}
+		frame.size.height = 2;
         attributes.frame = frame;
         self.markerAttributes = attributes;
     } else {

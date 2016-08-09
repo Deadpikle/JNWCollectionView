@@ -164,7 +164,7 @@ static const CGSize JNWCollectionViewGridLayoutDefaultSize = (CGSize){ 44.f, 44.
         JNWCollectionViewLayoutAttributes *attributes = [self layoutAttributesForItemAtIndexPath:indexPath];
         CGRect frame = attributes.frame;
         if (indexPath.jnw_relation == JNWCollectionViewDropRelationAfter) {
-            frame.origin.x += self.itemSize.width + 2; // make it appear "after" the dragged-over item (+2 accounts for width)
+            frame.origin.x += frame.size.width + 2; // make it appear "after" the dragged-over item (+2 accounts for width)
         }
         frame.size.width = 2;
         attributes.frame = frame;
