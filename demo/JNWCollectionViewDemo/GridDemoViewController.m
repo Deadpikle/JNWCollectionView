@@ -48,7 +48,7 @@ static NSString * const identifier = @"CELL";
 	[self.collectionView.collectionViewLayout invalidateLayout];
 }
 
-- (NSView *)collectionView:(JNWCollectionView *)collectionView dropMarkerViewWithFrame:(NSRect)frame {
+- (NSView *)collectionView:(JNWCollectionView *)collectionView dropMarkerViewWithFrame:(NSRect)frame forIndexPath:(JNWCollectionViewDropIndexPath *)indexPath {
     frame.size.width += 2;
     frame.origin.x -= 5;
     ListMarker *marker = [[ListMarker alloc] initWithFrame:frame];

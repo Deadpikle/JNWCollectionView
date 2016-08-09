@@ -164,8 +164,18 @@ static const CGSize JNWCollectionViewGridLayoutDefaultSize = (CGSize){ 44.f, 44.
         JNWCollectionViewLayoutAttributes *attributes = [self layoutAttributesForItemAtIndexPath:indexPath];
         CGRect frame = attributes.frame;
         if (indexPath.jnw_relation == JNWCollectionViewDropRelationAfter) {
-            frame.origin.x += frame.size.width + self.itemHorizontalMargin + 2; // make it appear "after" the dragged-over item
+			frame.origin.x += frame.size.width + 2; // make it appear "after" the dragged-over item
+			NSInteger numberOfRowsForFinalSection = [self.collectionView numberOfItemsInSection:self.sections.count - 1];
+			// If not dragging to the very last item in the very last section, account for vertical spacing
+			if (indexPath.jnw_section != self.sections.count - 1 || indexPath.jnw_item != numberOfRowsForFinalSection - 1) {
+				frame.origin.x += (self.itemHorizontalMargin / 2);
+			}
         }
+		else {
+			// If not dragging to before the first item, take out vertical spacing
+			if (indexPath.jnw_section != 0 || indexPath.jnw_item != 0)
+				frame.origin.x -= (self.itemHorizontalMargin / 2);
+		}
         frame.size.width = 2;
         attributes.frame = frame;
         self.markerAttributes = attributes;

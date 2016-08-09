@@ -65,6 +65,7 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewSelectionType) {
 		
 		unsigned int dragDropDelegateAllowsDragDrop:1;
 		unsigned int dragDropDelegateDropMarker:1;
+		unsigned int dragDropDelegateDropMarkerForIndexPath:1;
 		
 		unsigned int wantsLayout;
 	} _collectionViewFlags;
@@ -203,6 +204,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	[self registerForDraggedTypes:[dragDropDelegate draggedTypesForCollectionView:self]];
 	
 	_collectionViewFlags.dragDropDelegateDropMarker = [dragDropDelegate respondsToSelector:@selector(collectionView:dropMarkerViewWithFrame:)];
+	_collectionViewFlags.dragDropDelegateDropMarkerForIndexPath = [dragDropDelegate respondsToSelector:@selector(collectionView:dropMarkerViewWithFrame:forIndexPath:)];
 	_collectionViewFlags.dragDropDelegateAllowsDragDrop = [dragDropDelegate respondsToSelector:@selector(collectionView:shouldAllowDragDropForIndices:)];
 }
 
@@ -1399,13 +1401,21 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 }
 
 - (void)updateDropMarker {
-	if (_collectionViewFlags.dragDropDelegateDropMarker) {
+	if (_collectionViewFlags.dragDropDelegateDropMarker || _collectionViewFlags.dragDropDelegateDropMarkerForIndexPath) {
 		JNWCollectionViewLayoutAttributes *attributes = [self.collectionViewLayout layoutAttributesForDropMarker];
 		NSView *markerView;
 		if (attributes) {
 			// Ideally, dropMarkerViewWithFrame would know the JNWCollectionViewDropRelation so that it could draw itself differently
 			// depending on where the item should be dropped.
-			markerView = [self.dragDropDelegate collectionView:self dropMarkerViewWithFrame:attributes.frame];
+			if (_collectionViewFlags.dragDropDelegateDropMarkerForIndexPath) {
+				markerView = [self.dragDropDelegate collectionView:self dropMarkerViewWithFrame:attributes.frame forIndexPath:self.dragContext.dropPath];
+			}
+			else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+				markerView = [self.dragDropDelegate collectionView:self dropMarkerViewWithFrame:attributes.frame];
+#pragma clang diagnostic pop
+			}
 			markerView.alphaValue = attributes.alpha;
 		} else {
 			markerView = nil;

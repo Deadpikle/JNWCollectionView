@@ -39,6 +39,7 @@ static NSString * const headerIdentifier = @"HEADER";
     JNWCollectionViewListLayout *layout = [[JNWCollectionViewListLayout alloc] init];
     layout.rowHeight = 44.0f;
     layout.delegate = self;
+	layout.verticalSpacing = 6.0f;
     [layout setAutoScroll:YES];
     self.collectionView.collectionViewLayout = layout;
     
@@ -66,9 +67,9 @@ static NSString * const headerIdentifier = @"HEADER";
     return cell;
 }
 
-- (NSView *)collectionView:(JNWCollectionView *)collectionView dropMarkerViewWithFrame:(NSRect)frame {
+- (NSView *)collectionView:(JNWCollectionView *)collectionView dropMarkerViewWithFrame:(NSRect)frame forIndexPath:(JNWCollectionViewDropIndexPath *)indexPath {
     frame.size.height += 1;
-    frame.origin.y -= 1;
+	//frame.origin.y -= 1;
     return [[ListMarker alloc] initWithFrame:frame];
 }
 
