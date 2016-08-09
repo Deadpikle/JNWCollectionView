@@ -147,7 +147,7 @@ NSString * const JNWCollectionViewListLayoutFooterKind = @"JNWCollectionViewList
         JNWCollectionViewLayoutAttributes *attributes = [self layoutAttributesForItemAtIndexPath:indexPath];
         CGRect frame = attributes.frame;
         if (indexPath.jnw_relation == JNWCollectionViewDropRelationAfter) {
-            frame.origin.y += frame.size.height;
+			frame.origin.y += frame.size.height + self.verticalSpacing;
 		}
 		frame.size.height = 2;
         attributes.frame = frame;
