@@ -28,6 +28,10 @@
 #import "JNWCollectionViewLayout.h"
 #import "JNWCollectionViewLayout+Private.h"
 
+#import "NSSet+Map.h"
+#import "NSDictionary+Mapping.h"
+#import "NSArray+Mapping.h"
+
 typedef NS_ENUM(NSInteger, JNWCollectionViewSelectionType) {
 	JNWCollectionViewSelectionTypeSingle,
 	JNWCollectionViewSelectionTypeExtending,
@@ -84,6 +88,12 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewSelectionType) {
 
 @property (nonatomic, strong) NSView *collectionViewDocumentView;
 
+// Insert & Delete
+@property BOOL willBeginBatchUpdates;
+@property BOOL isAnimating;
+@property NSMutableArray<NSIndexPath*> *insertedItems;
+@property NSMutableArray<NSIndexPath*> *deletedItems;
+
 @end
 
 @implementation JNWCollectionView
@@ -112,7 +122,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	JNWCollectionViewDocumentView *documentView = [[JNWCollectionViewDocumentView alloc] initWithFrame:CGRectZero];
 	collectionView.collectionViewDocumentView = documentView;
 	collectionView.documentView = documentView;
-		
+	
 	// We don't want to perform an initial layout pass until the user has called -reloadData.
 	collectionView->_collectionViewFlags.wantsLayout = NO;
 	
@@ -122,6 +132,9 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	
 	collectionView.backgroundColor = NSColor.whiteColor;
 	collectionView.drawsBackground = YES;
+	
+	collectionView.insertedItems = [NSMutableArray array];
+	collectionView.deletedItems = [NSMutableArray array];
 }
 
 - (id)initWithFrame:(NSRect)frameRect {
@@ -140,7 +153,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 
 #pragma mark Delegate and data source
 
-- (void)setDelegate:(id<JNWCollectionViewDelegate>)delegate {	
+- (void)setDelegate:(id<JNWCollectionViewDelegate>)delegate {
 	_delegate = delegate;
 	_collectionViewFlags.delegateMouseUp = [delegate respondsToSelector:@selector(collectionView:mouseUpInItemAtIndexPath:)];
 	_collectionViewFlags.delegateMouseUpWithEvent = [delegate respondsToSelector:@selector(collectionView:mouseUpInItemAtIndexPath:withEvent:)];
@@ -241,7 +254,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		reusableCells = [NSMutableArray array];
 		reuse[identifier] = reusableCells;
 	}
-
+	
 	[reusableCells addObject:item];
 }
 
@@ -266,7 +279,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 - (JNWCollectionViewCell *)dequeueReusableCellWithIdentifier:(NSString *)identifier {
 	NSParameterAssert(identifier);
 	JNWCollectionViewCell *cell = [self dequeueItemWithIdentifier:identifier inReusePool:self.reusableCells];
-
+	
 	// If the view doesn't exist, we go ahead and create one. If we have a class registered
 	// for this identifier, we use it, otherwise we just create an instance of JNWCollectionViewCell.
 	if (cell == nil) {
@@ -313,7 +326,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	
 	view.reuseIdentifier = reuseIdentifier;
 	view.kind = kind;
-
+	
 	return view;
 }
 
@@ -330,11 +343,11 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 
 - (void)reloadData {
 	_collectionViewFlags.wantsLayout = YES;
-
+	
 	// Remove and notify any selected indexes we've been tracking.
 	NSArray *selectedIndexes = self.selectedIndexes.copy;
 	[self.selectedIndexes removeAllObjects];
-
+	
 	if (_collectionViewFlags.delegateDidDeselect) {
 		for (NSIndexPath *indexPath in selectedIndexes) {
 			[self.delegate collectionView:self didDeselectItemAtIndexPath:indexPath];
@@ -470,7 +483,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	if (potentialIndexPaths != nil) {
 		return potentialIndexPaths;
 	}
-		
+	
 	NSMutableArray *visibleCells = [NSMutableArray array];
 	
 	for (int i = 0; i < self.data.numberOfSections; i++) {
@@ -488,7 +501,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 			}
 		}
 	}
-
+	
 	return visibleCells;
 }
 
@@ -507,13 +520,13 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 			if (CGRectIntersectsRect(attributes.frame, rect)) {
 				[visibleIdentifiers addObject:[self layoutIdentifierForSupplementaryViewIdentifier:identifier inSection:section.index]];
 			}
-		}		
+		}
 	}
 	
 	return visibleIdentifiers.copy;
 }
 
-- (NSIndexSet *)indexesForSectionsInRect:(CGRect)rect {	
+- (NSIndexSet *)indexesForSectionsInRect:(CGRect)rect {
 	NSMutableIndexSet *indexes = [NSMutableIndexSet indexSet];
 	
 	if (CGRectEqualToRect(rect, CGRectZero))
@@ -537,7 +550,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	if (_collectionViewFlags.delegateShouldScroll && ![self.delegate collectionView:self shouldScrollToItemAtIndexPath:indexPath]) {
 		return;
 	}
-
+	
 	CGRect rect = [self rectForItemAtIndexPath:indexPath];
 	CGRect visibleRect = self.documentVisibleRect;
 	
@@ -623,7 +636,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 
 - (void)layout {
 	[super layout];
-
+	
 	if (CGSizeEqualToSize(self.visibleSize, _lastDrawnSize)) {
 		[self layoutCells];
 		[self layoutSupplementaryViews];
@@ -634,7 +647,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		CGRect visibleBounds = (CGRect){ .size = self.visibleSize };
 		BOOL shouldInvalidate = [self.collectionViewLayout shouldInvalidateLayoutForBoundsChange:visibleBounds];
 		[self.data recalculateAndPrepareLayout:shouldInvalidate];
-
+		
 		[self performFullRelayoutForcingSubviewsReset:NO];
 	}
 }
@@ -663,7 +676,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		return;
 	
 	[self updateScrollDirection];
-
+	
 	NSView *documentView = self.documentView;
 	documentView.frameSize = self.data.encompassingSize;
 }
@@ -706,11 +719,11 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 			[self applyLayoutAttributes:attributes toCell:cell];
 		}
 	}
-
+	
 	NSArray *oldVisibleIndexPaths = [self.visibleCellsMap allKeys];
 	NSArray *updatedVisibleIndexPaths = [self indexPathsForItemsInRect:self.documentVisibleRect];
-
-
+	
+	
 	NSMutableArray *indexPathsToRemove = [NSMutableArray arrayWithArray:oldVisibleIndexPaths];
 	[indexPathsToRemove removeObjectsInArray:updatedVisibleIndexPaths];
 	
@@ -719,62 +732,89 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	
 	// Remove old cells and put them in the reuse queue
 	for (NSIndexPath *indexPath in indexPathsToRemove) {
-		JNWCollectionViewCell *cell = [self cellForItemAtIndexPath:indexPath];
-		[self.visibleCellsMap removeObjectForKey:indexPath];
-		[self enqueueReusableCell:cell withIdentifier:cell.reuseIdentifier];
-		
-		[cell setHidden:YES];
-
-		if (_collectionViewFlags.delegateDidEndDisplayingCell) {
-			[self.delegate collectionView:self didEndDisplayingCell:cell forItemAtIndexPath:indexPath];
-		}
+		[self removeAndEnqueueCellAtIndexPath:indexPath];
 	}
 	
 	// Add the new cells
 	for (NSIndexPath *indexPath in indexPathsToAdd) {
-		JNWCollectionViewCell *cell = [self.dataSource collectionView:self cellForItemAtIndexPath:indexPath];
-		
-		// If any of these are true this cell isn't valid, and we'll be forced to skip it and throw the relevant exceptions.
-		if (cell == nil || ![cell isKindOfClass:JNWCollectionViewCell.class]) {
-			NSAssert(cell != nil, @"collectionView:cellForItemAtIndexPath: must return a non-nil cell.");
-			// Although we have checked to ensure the class registered for the cell is a subclass
-			// of JNWCollectionViewCell earlier, there's always the chance that the user has
-			// not used the dedicated dequeuing method to retrieve their newly created cell and
-			// instead have just created it themselves. There's not much we can do to prevent this,
-			// so it's probably worth it to double check this one more time.
-			NSAssert([cell isKindOfClass:JNWCollectionViewCell.class],
-					 @"collectionView:cellForItemAtIndexPath: must return an instance or subclass of JNWCollectionViewCell.");
-			continue;
-		}
-		cell.indexPath = indexPath;
-		cell.collectionView = self;
-		
-		JNWCollectionViewLayoutAttributes *attributes = [self.collectionViewLayout layoutAttributesForItemAtIndexPath:indexPath];
-		[self applyLayoutAttributes:attributes toCell:cell];
-		
-		if (cell.superview == nil) {
-			[self.documentView addSubview:cell];
-		} else {
-			[cell setHidden:NO];
-		}
-
-		if ([self.selectedIndexes containsObject:indexPath])
-			cell.selected = YES;
-		else
-			cell.selected = NO;
-		
-		self.visibleCellsMap[indexPath] = cell;
+		[self addCellForIndexPath:indexPath];
 	}
+}
+
+- (JNWCollectionViewCell*)addCellForIndexPath:(NSIndexPath*)indexPath {
+	JNWCollectionViewCell *cell = [self.dataSource collectionView:self cellForItemAtIndexPath:indexPath];
+	
+	// If any of these are true this cell isn't valid, and we'll be forced to skip it and throw the relevant exceptions.
+	if (cell == nil || ![cell isKindOfClass:JNWCollectionViewCell.class]) {
+		NSAssert(cell != nil, @"collectionView:cellForItemAtIndexPath: must return a non-nil cell.");
+		// Although we have checked to ensure the class registered for the cell is a subclass
+		// of JNWCollectionViewCell earlier, there's always the chance that the user has
+		// not used the dedicated dequeuing method to retrieve their newly created cell and
+		// instead have just created it themselves. There's not much we can do to prevent this,
+		// so it's probably worth it to double check this one more time.
+		NSAssert([cell isKindOfClass:JNWCollectionViewCell.class],
+				 @"collectionView:cellForItemAtIndexPath: must return an instance or subclass of JNWCollectionViewCell.");
+		return nil;
+	}
+	cell.indexPath = indexPath;
+	cell.collectionView = self;
+	
+	[self updateLayoutAttributesForCell:cell indexPath:indexPath];
+	
+	// TODO INSERT: NSAnimationContext
+	
+	if (cell.superview == nil) {
+		[self.documentView addSubview:cell];
+	} else {
+		[cell setHidden:NO];
+	}
+	
+	[self updateSelectionStateOfCell:cell];
+	
+	self.visibleCellsMap[indexPath] = cell;
+	
+	return cell;
+}
+
+- (void)removeAndEnqueueCellAtIndexPath:(NSIndexPath*)indexPath {
+	JNWCollectionViewCell *cell = [self cellForItemAtIndexPath:indexPath];
+	[self.visibleCellsMap removeObjectForKey:indexPath];
+	[self enqueueReusableCell:cell withIdentifier:cell.reuseIdentifier];
+	[cell setHidden:YES];
+	
+	if (_collectionViewFlags.delegateDidEndDisplayingCell) {
+		[self.delegate collectionView:self didEndDisplayingCell:cell forItemAtIndexPath:indexPath];
+	}
+}
+
+- (void)updateLayoutAttributesForCell:(JNWCollectionViewCell*)cell indexPath:(NSIndexPath*)indexPath {
+	JNWCollectionViewLayoutAttributes *attributes = [self.collectionViewLayout layoutAttributesForItemAtIndexPath:indexPath];
+	[self applyLayoutAttributes:attributes toCell:cell];
 }
 
 - (void)applyLayoutAttributes:(JNWCollectionViewLayoutAttributes *)attributes toCell:(JNWCollectionViewCell *)cell {
 	[cell willLayoutWithFrame:attributes.frame];
-
+	
 	cell.frame = attributes.frame;
 	cell.alphaValue = attributes.alpha;
 	cell.layer.zPosition = attributes.zIndex;
 	
 	[cell didLayoutWithFrame:attributes.frame];
+}
+
+- (void)updateCell:(JNWCollectionViewCell*)cell forIndexPath:(NSIndexPath*)indexPath {
+	cell.indexPath = indexPath;
+	cell.collectionView = self;
+	
+	[self updateLayoutAttributesForCell:cell indexPath:indexPath];
+}
+
+- (void)updateSelectionStateOfCell:(JNWCollectionViewCell *)cell {
+	if ([self.selectedIndexes containsObject:cell.indexPath]) {
+		cell.selected = YES;
+	} else {
+		cell.selected = NO;
+	}
 }
 
 #pragma mark Supplementary Views
@@ -837,10 +877,10 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	// might not be of the same type in each section, due to the fact that the user might have registered multiple classes/identifiers
 	// for the same kind. So what we're wanting to do is just loop through the kinds and ask the data source for the supplementary view
 	// for each section/kind.
-			
+	
 	// { "index/kind/identifier" : view }
 	NSArray *oldVisibleViewsIdentifiers = self.visibleSupplementaryViewsMap.allKeys;
-	NSArray *updatedVisibleViewsIdentifiers = [self layoutIdentifiersForSupplementaryViewsInRect:self.documentVisibleRect];	
+	NSArray *updatedVisibleViewsIdentifiers = [self layoutIdentifiersForSupplementaryViewsInRect:self.documentVisibleRect];
 	
 	NSMutableArray *viewsToRemoveIdentifers = [NSMutableArray arrayWithArray:oldVisibleViewsIdentifiers];
 	[viewsToRemoveIdentifers removeObjectsInArray:updatedVisibleViewsIdentifiers];
@@ -857,7 +897,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		
 		[self enqueueReusableSupplementaryView:view ofKind:view.kind withReuseIdentifier:view.reuseIdentifier];
 	}
-		
+	
 	// Add new views
 	for (NSString *layoutIdentifier in viewsToAddIdentifiers) {
 		NSInteger section = [self sectionForSupplementaryLayoutIdentifier:layoutIdentifier];
@@ -948,7 +988,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	
 	JNWCollectionViewCell *cell = [self cellForItemAtIndexPath:indexPath];
 	[cell setSelected:YES animated:self.animatesSelection];
-
+	
 	if (![self.selectedIndexes containsObject:indexPath])
 		[self.selectedIndexes addObject:indexPath];
 	
@@ -958,8 +998,8 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 }
 
 - (void)selectItemAtIndexPath:(NSIndexPath *)indexPath
-			atScrollPosition:(JNWCollectionViewScrollPosition)scrollPosition
-					animated:(BOOL)animated {
+			 atScrollPosition:(JNWCollectionViewScrollPosition)scrollPosition
+					 animated:(BOOL)animated {
 	[self selectItemAtIndexPath:indexPath atScrollPosition:scrollPosition animated:animated selectionType:JNWCollectionViewSelectionTypeSingle];
 }
 
@@ -991,9 +1031,9 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 }
 
 - (void)selectItemAtIndexPath:(NSIndexPath *)indexPath
-			atScrollPosition:(JNWCollectionViewScrollPosition)scrollPosition
-					animated:(BOOL)animated
-			   selectionType:(JNWCollectionViewSelectionType)selectionType {
+			 atScrollPosition:(JNWCollectionViewScrollPosition)scrollPosition
+					 animated:(BOOL)animated
+				selectionType:(JNWCollectionViewSelectionType)selectionType {
 	if (indexPath == nil)
 		return;
 	
@@ -1062,7 +1102,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	if (indexPath == nil) {
 		NSLog(@"***index path not found for selection.");
 	}
-
+	
 	if (_collectionViewFlags.delegateMouseUpWithEvent) {
 		[self.delegate collectionView:self mouseUpInItemAtIndexPath:indexPath withEvent:event];
 	} else if (_collectionViewFlags.delegateMouseUp) {
@@ -1071,7 +1111,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		[self.delegate collectionView:self mouseUpInItemAtIndexPath:indexPath];
 #pragma clang diagnostic pop
 	}
-
+	
 	// Detect if modifier flags are held down.
 	// We prioritize the command key over the shift key.
 	if (event.modifierFlags & NSCommandKeyMask) {
@@ -1095,7 +1135,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		NSIndexPath *indexPath = [self indexPathForCell:cell];
 		[self.delegate collectionView:self mouseEnteredInItemAtIndexPath:indexPath withEvent:event];
 	}
-
+	
 	[[self.visibleCellsMap allValues] enumerateObjectsUsingBlock:^(JNWCollectionViewCell *cell, NSUInteger index, BOOL *stop) {
 		cell.hovered = NO;
 	}];
@@ -1107,7 +1147,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		NSIndexPath *indexPath = [self indexPathForCell:cell];
 		[self.delegate collectionView:self mouseExitedInItemAtIndexPath:indexPath withEvent:event];
 	}
-
+	
 	cell.hovered = NO;
 }
 
@@ -1222,5 +1262,196 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	NSRect scrollToRect = NSMakeRect(documentSize.width, documentSize.height, 0, 0);
 	[self.clipView scrollRectToVisible:scrollToRect animated:self.animatesSelection];
 }
+
+#pragma mark Insert & Delete
+
+- (void)insertItemsAtIndexPaths:(NSArray<NSIndexPath*> *)insertedIndexPaths {
+	[self.insertedItems addObjectsFromArray:insertedIndexPaths];
+	[self animateUpdates:NULL];
+}
+
+- (void)deleteItemsAtIndexPaths:(NSArray<NSIndexPath*> *)deletedIndexPaths {
+	[self.deletedItems addObjectsFromArray:deletedIndexPaths];
+	[self animateUpdates:NULL];
+	
+}
+
+- (void)reloadItemsAtIndexPaths:(NSArray<NSIndexPath*> *)reloadedIndexPaths {
+	for (NSIndexPath* indexPath in reloadedIndexPaths) {
+		if ([self cellForItemAtIndexPath:indexPath] != nil) {
+			[self removeAndEnqueueCellAtIndexPath:indexPath];
+			[self addCellForIndexPath:indexPath];
+		}
+	}
+}
+
+- (void)performBatchUpdates:(void (^)(void))updates completion:(void (^)(BOOL finished))completion {
+	self.willBeginBatchUpdates = YES;
+	updates();
+	self.willBeginBatchUpdates = NO;
+	[self animateUpdates:completion];
+	
+}
+
+- (void)animateUpdates:(void (^)(BOOL))completion
+{
+	if (self.willBeginBatchUpdates) {
+		return;
+	}
+	
+	if (self.isAnimating) {
+		NSLog(@"TODO: multiple simultaneous animations are not supported yet");
+		return;
+	}
+	
+	self.isAnimating = YES;
+	NSArray* insertedIndexPaths = [self.insertedItems sortedArrayUsingSelector:@selector(compare:)];
+	NSArray* deletedIndexPaths = self.deletedItems;
+	
+	// TODO: Use IndexSet?
+	NSIndexPath*(^existingIndexPathMapping)(NSIndexPath*) = ^NSIndexPath*(NSIndexPath* oldIndexPath) {
+		NSInteger newItem = oldIndexPath.jnw_item;
+		for (NSIndexPath* deletedIndexPath in deletedIndexPaths) {
+			if (deletedIndexPath.jnw_section == oldIndexPath.jnw_section && oldIndexPath.jnw_item > deletedIndexPath.jnw_item) {
+				newItem--;
+			}
+		}
+		for(NSIndexPath* insertedIndexPath in insertedIndexPaths) {
+			if (insertedIndexPath.jnw_section == oldIndexPath.jnw_section && newItem >= insertedIndexPath.jnw_item) {
+				newItem++;
+			}
+		}
+		return [NSIndexPath jnw_indexPathForItem:newItem inSection:0];
+	};
+	
+	
+	NSArray* deletedCells = [deletedIndexPaths map:^id (id indexPath)
+							 {
+								 JNWCollectionViewCell* cell = [self cellForItemAtIndexPath:indexPath];
+								 [self.visibleCellsMap removeObjectForKey:indexPath];
+								 return cell;
+							 }];
+	
+	
+	
+	NSDictionary* dictionary = self.visibleCellsMap;
+	self.visibleCellsMap = [[dictionary uint_dictionaryByMappingKeys:existingIndexPathMapping] mutableCopy];
+	
+	
+	
+	NSArray* sortedVisibleIndexPaths = [self.indexPathsForVisibleItems sortedArrayUsingSelector:@selector(compare:)] ;
+	NSMutableSet *visibleIndexPathsWithoutDeletions = [NSMutableSet setWithArray:sortedVisibleIndexPaths];
+	[visibleIndexPathsWithoutDeletions minusSet:[NSSet setWithArray:deletedIndexPaths]];
+	NSSet *oldVisibleItems = [visibleIndexPathsWithoutDeletions map:existingIndexPathMapping];
+	
+	
+	// Add existing cells that were not visible before
+	NSMutableSet* newVisibleItems = [NSMutableSet set];
+	
+	[NSAnimationContext runAnimationGroup:^(NSAnimationContext* context)
+	 {
+		 // Animate in from the top
+		 NSIndexPath* oldFirstVisibleIndexPath = sortedVisibleIndexPaths.firstObject;
+		 NSInteger numberOfItemsToBeInsertedAtBeginning = existingIndexPathMapping(oldFirstVisibleIndexPath).jnw_item - oldFirstVisibleIndexPath.jnw_item;
+		 if (numberOfItemsToBeInsertedAtBeginning > 0) {
+			 for (NSUInteger i = 1; i <= numberOfItemsToBeInsertedAtBeginning; i++) {
+				 NSIndexPath* oldIndexPath = [NSIndexPath jnw_indexPathForItem:oldFirstVisibleIndexPath.jnw_item-i inSection:0];
+				 if (oldIndexPath.jnw_item < 0) continue;
+				 NSIndexPath* indexPath = existingIndexPathMapping(oldIndexPath);
+				 [self addCellForIndexPath:indexPath];
+				 JNWCollectionViewCell* cell = [self cellForItemAtIndexPath:indexPath];
+				 [self updateLayoutAttributesForCell:cell indexPath:oldIndexPath];
+				 [newVisibleItems addObject:indexPath];
+			 }
+		 }
+		 
+		 // Animate in from the bottom
+		 NSIndexPath* oldLastVisibleIndexPath = sortedVisibleIndexPaths.lastObject;
+		 NSInteger numberOfItemsToBeInsertedAtEnd = oldLastVisibleIndexPath.jnw_item - existingIndexPathMapping(oldLastVisibleIndexPath).jnw_item;
+		 if (numberOfItemsToBeInsertedAtEnd > 0) {
+			 
+			 for (NSUInteger i = 1; numberOfItemsToBeInsertedAtEnd > 0 && oldLastVisibleIndexPath.jnw_item+i < [self.data numberOfItemsInSection:0]; i++) {
+				 NSIndexPath* oldIndexPath = [NSIndexPath jnw_indexPathForItem:oldLastVisibleIndexPath.jnw_item+i inSection:0];
+				 
+				 if (![deletedIndexPaths containsObject:oldIndexPath]) {
+					 context.duration = 0;
+					 NSIndexPath* indexPath = existingIndexPathMapping(oldIndexPath);
+					 JNWCollectionViewCell* cell = [self addCellForIndexPath:indexPath];
+					 [self updateLayoutAttributesForCell:cell indexPath:oldIndexPath];
+					 [newVisibleItems addObject:indexPath];
+					 numberOfItemsToBeInsertedAtEnd--;
+				 }
+			 }
+		 }
+	 } completionHandler:NULL];
+	
+	
+	self.selectedIndexes = [self.selectedIndexes map:existingIndexPathMapping].mutableCopy;
+	[self.data recalculateAndPrepareLayout:YES];
+	//[self restoreSelectionIfPossible:self.selectedIndexes.copy];
+	
+	NSArray* visibleIndexPaths = self.indexPathsForVisibleItems;
+	
+	[NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
+		context.duration = 0;
+		for(NSIndexPath* indexPath in insertedIndexPaths) {
+			if ([visibleIndexPaths containsObject:indexPath]) {
+				[self addCellForIndexPath:indexPath];
+				JNWCollectionViewCell* cell = [self cellForItemAtIndexPath:indexPath];
+				cell.alphaValue = 0;
+			}
+		}
+	} completionHandler:NULL];
+	
+	NSMutableArray* indexPathsToBeRemoved = [NSMutableArray array];
+	NSSet* movingCells = [oldVisibleItems setByAddingObjectsFromSet:newVisibleItems];
+	
+	[NSAnimationContext runAnimationGroup:^(NSAnimationContext* context)
+	 {
+		 context.allowsImplicitAnimation = YES;
+		 
+		 for (NSIndexPath* indexPath in movingCells) {
+			 JNWCollectionViewCell* cell = [self cellForItemAtIndexPath:indexPath];
+			 [self updateCell:cell forIndexPath:indexPath];
+			 [indexPathsToBeRemoved addObject:indexPath];
+			 
+		 }
+		 
+		 for(NSIndexPath* indexPath in insertedIndexPaths) {
+			 if ([visibleIndexPaths containsObject:indexPath]) {
+				 JNWCollectionViewCell* cell = [self cellForItemAtIndexPath:indexPath];
+				 cell.alphaValue = 1;
+			 }
+		 }
+		 
+		 for (JNWCollectionViewCell* cell in deletedCells) {
+			 cell.alphaValue = 0;
+		 }
+		 
+	 } completionHandler:^ {
+		 NSArray* visibleItems = self.indexPathsForVisibleItems;
+		 for (NSIndexPath* indexPath in indexPathsToBeRemoved) {
+			 if (! [visibleItems containsObject:indexPath]) {
+				 [self removeAndEnqueueCellAtIndexPath:indexPath];
+			 } else {
+				 [self updateSelectionStateOfCell:[self cellForItemAtIndexPath:indexPath]];
+			 }
+		 }
+		 for (JNWCollectionViewCell* cell in deletedCells) {
+			 cell.alphaValue = 1;
+			 [self enqueueReusableCell:cell withIdentifier:cell.reuseIdentifier];
+			 [cell setHidden:YES];
+		 }
+		 self.isAnimating = NO;
+		 [self layoutDocumentView];
+		 if (completion != NULL) {
+			 completion(YES);
+		 }
+	 }];
+	
+	[self.insertedItems removeAllObjects];
+	[self.deletedItems removeAllObjects];
+}
+
 
 @end

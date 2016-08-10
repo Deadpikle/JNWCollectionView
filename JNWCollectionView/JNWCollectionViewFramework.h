@@ -307,4 +307,10 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewScrollPosition) {
 /// Deselects all items in the collection view.
 - (void)deselectAllItems;
 
+#pragma mark - Insert & Delete
+- (void)insertItemsAtIndexPaths:(NSArray<NSIndexPath*> *)insertedIndexPaths;
+- (void)deleteItemsAtIndexPaths:(NSArray<NSIndexPath*> *)deletedIndexPaths;
+- (void)reloadItemsAtIndexPaths:(NSArray<NSIndexPath*> *)reloadedIndexPaths;
+- (void)performBatchUpdates:(void (^)(void))updates completion:(void (^)(BOOL finished))completion;
+
 @end

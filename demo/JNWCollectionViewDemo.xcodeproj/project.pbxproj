@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		34C1753F1D5BD3FA00102B0A /* ManipulateItemsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34C1753D1D5BD3FA00102B0A /* ManipulateItemsViewController.m */; };
+		34C175401D5BD3FA00102B0A /* ManipulateItemsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 34C1753E1D5BD3FA00102B0A /* ManipulateItemsViewController.xib */; };
 		AB15147F171511DD00871248 /* JNWCollectionView.framework in Copy Framework */ = {isa = PBXBuildFile; fileRef = AB2E9603170CB107004678DC /* JNWCollectionView.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		AB29A69016FEFE1B00C9A941 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB29A68F16FEFE1B00C9A941 /* QuartzCore.framework */; };
 		AB2E9606170CB116004678DC /* JNWCollectionView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AB2E9603170CB107004678DC /* JNWCollectionView.framework */; };
@@ -64,6 +66,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		34C1753C1D5BD3FA00102B0A /* ManipulateItemsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ManipulateItemsViewController.h; path = JNWCollectionViewDemo/ManipulateItemsViewController.h; sourceTree = SOURCE_ROOT; };
+		34C1753D1D5BD3FA00102B0A /* ManipulateItemsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ManipulateItemsViewController.m; path = JNWCollectionViewDemo/ManipulateItemsViewController.m; sourceTree = SOURCE_ROOT; };
+		34C1753E1D5BD3FA00102B0A /* ManipulateItemsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ManipulateItemsViewController.xib; path = JNWCollectionViewDemo/ManipulateItemsViewController.xib; sourceTree = SOURCE_ROOT; };
 		AB29A68F16FEFE1B00C9A941 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		AB2E95FD170CB107004678DC /* JNWCollectionView.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = JNWCollectionView.xcodeproj; path = ../JNWCollectionView.xcodeproj; sourceTree = "<group>"; };
 		AB2E960A170CB196004678DC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = JNWCollectionViewDemo/en.lproj/MainMenu.xib; sourceTree = SOURCE_ROOT; };
@@ -120,6 +125,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		34C1753B1D5BD3B100102B0A /* Manipulate Items Demo */ = {
+			isa = PBXGroup;
+			children = (
+				34C1753C1D5BD3FA00102B0A /* ManipulateItemsViewController.h */,
+				34C1753D1D5BD3FA00102B0A /* ManipulateItemsViewController.m */,
+				34C1753E1D5BD3FA00102B0A /* ManipulateItemsViewController.xib */,
+			);
+			name = "Manipulate Items Demo";
+			sourceTree = "<group>";
+		};
 		AB2E95FE170CB107004678DC /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -202,6 +217,7 @@
 				ABB1B203171E068E009B9270 /* List Layout Demo */,
 				ABA276A0171D00FF005C8E56 /* Grid Layout Demo */,
 				ABA276A7171D144B005C8E56 /* NSTableView (Comparison) Demo */,
+				34C1753B1D5BD3B100102B0A /* Manipulate Items Demo */,
 				ABB0F2FD16FD7D19002004F5 /* Supporting Files */,
 				ABB1B205171E095B009B9270 /* NSImage+DemoAdditions.h */,
 				ABB1B206171E095B009B9270 /* NSImage+DemoAdditions.m */,
@@ -308,6 +324,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34C175401D5BD3FA00102B0A /* ManipulateItemsViewController.xib in Resources */,
 				AB3C7241170CAC2C004A91DB /* Credits.rtf in Resources */,
 				AB3C7242170CAC2C004A91DB /* InfoPlist.strings in Resources */,
 				AB2E960B170CB196004678DC /* MainMenu.xib in Resources */,
@@ -331,6 +348,7 @@
 				ABAF15691718E67C00658A1D /* DemoWindowController.m in Sources */,
 				ABAF156D1718F6D000658A1D /* ListDemoViewController.m in Sources */,
 				ABA2769D171CFC80005C8E56 /* GridDemoViewController.m in Sources */,
+				34C1753F1D5BD3FA00102B0A /* ManipulateItemsViewController.m in Sources */,
 				ABA276A3171D0130005C8E56 /* GridCell.m in Sources */,
 				ABA276AB171D146D005C8E56 /* NSTableViewDemoViewController.m in Sources */,
 				ABF854121BF5A1FC001087FE /* Label.m in Sources */,
