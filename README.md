@@ -6,10 +6,10 @@
 > With the release of OS X 10.11, Apple introduced a new version of `NSCollectionView` with an API similar to `UICollectionView`. I recommend using `NSCollectionView` for any new 10.11+ projects. This library remains a resource for projects needing backwards compatibility. This project has been soft-deprecated.
 
 ---
----
 
-**Important Note:**
-> The `develop` branch is the merge of the `cell-binding`, `drag-drop`, and `insert-delete` branches. Each of those branches should be OK to merge from master individually as you need, but if you need/want all three, develop/merge from `develop`. Updates for each of those features should happen on the individual branches.
+---
+**Note on branches for this fork:**
+> The develop branch is the merge of the cell-binding, drag-drop, and insert-delete branches. Each of those branches should be OK to merge from master individually as you need, but if you need/want all three, develop/merge from develop. Updates for each of those features should happen on the individual branches.
 ---
 
 
