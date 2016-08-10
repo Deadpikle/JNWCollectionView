@@ -9,8 +9,7 @@
 ---
 
 **Important Note:**
-> The `develop` branch is the merge of the `cell-binding`, `drag-drop`, and `insert-delete` branches. Each of those branches should be OK to merge from master individually as you need, but if you need/want all three, develop/merge from `develop`. 
-
+> The `develop` branch is the merge of the `cell-binding`, `drag-drop`, and `insert-delete` branches. Each of those branches should be OK to merge from master individually as you need, but if you need/want all three, develop/merge from `develop`. Updates for each of those features should happen on the individual branches.
 ---
 
 
