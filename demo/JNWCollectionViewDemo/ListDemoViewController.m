@@ -39,7 +39,6 @@ static NSString * const headerIdentifier = @"HEADER";
     JNWCollectionViewListLayout *layout = [[JNWCollectionViewListLayout alloc] init];
     layout.rowHeight = 44.0f;
     layout.delegate = self;
-	layout.verticalSpacing = 6.0f;
     [layout setAutoScroll:YES];
     self.collectionView.collectionViewLayout = layout;
     
