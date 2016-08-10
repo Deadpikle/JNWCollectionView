@@ -11,12 +11,14 @@
 #import "GridDemoViewController.h"
 #import "NSTableViewDemoViewController.h"
 #import "BindingsViewController.h"
+#import "ManipulateItemsViewController.h"
 
 typedef enum {
 	GridLayout = 0,
 	ListLayout = 1,
 	NSTableViewLayout = 2,
-	Bindings = 3
+	Bindings = 3,
+	ItemManipulation = 4
 } LayoutType;
 
 @interface DemoWindowController ()
@@ -50,6 +52,8 @@ typedef enum {
 		self.currentViewController = [[NSTableViewDemoViewController alloc] init];
 	} else if (layout == Bindings) {
 		self.currentViewController = [[BindingsViewController alloc] init];
+	} else if (layout == ItemManipulation) {
+		self.currentViewController = [[ManipulateItemsViewController alloc] init];
 	}
 }
 

@@ -384,4 +384,10 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewScrollPosition) {
 // During a drag and drop operation, returns context information.
 @property (nonatomic, readonly) JNWCollectionViewDragContext *dragContext;
 
+#pragma mark - Insert & Delete
+- (void)insertItemsAtIndexPaths:(NSArray<NSIndexPath*> *)insertedIndexPaths;
+- (void)deleteItemsAtIndexPaths:(NSArray<NSIndexPath*> *)deletedIndexPaths;
+- (void)reloadItemsAtIndexPaths:(NSArray<NSIndexPath*> *)reloadedIndexPaths;
+- (void)performBatchUpdates:(void (^)(void))updates completion:(void (^)(BOOL finished))completion;
+
 @end
