@@ -1709,10 +1709,11 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		 [self layoutDocumentView];
 		 // In Deadpikle's project, this updateCell loop was necessary to make items show up correctly on delete,
 		 // but in theory, it shouldn't be necessary. Not sure what the problem is yet...
-		 for (NSIndexPath *indexPath in self.visibleCellsMap.allKeys) {
+		 /*for (NSIndexPath *indexPath in self.visibleCellsMap.allKeys) {
 			 JNWCollectionViewCell *cell = self.visibleCellsMap[indexPath];
 			 [self updateCell:cell forIndexPath:indexPath];
-		 }
+		 }*/
+		 [self layoutCellsWithRedraw:YES];
 		 if (completion != NULL) {
 			 completion(YES);
 		 }
