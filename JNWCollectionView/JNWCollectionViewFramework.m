@@ -761,7 +761,10 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	
 	[self updateLayoutAttributesForCell:cell indexPath:indexPath];
 	
-	// TODO INSERT: NSAnimationContext
+	[NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
+		context.duration = 0;
+		[self updateCell:cell forIndexPath:indexPath];
+	} completionHandler:nil];
 	
 	if (cell.superview == nil) {
 		[self.documentView addSubview:cell];
@@ -1293,8 +1296,23 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	
 }
 
-- (void)animateUpdates:(void (^)(BOOL))completion
-{
+
+- (void)restoreSelectionIfPossible:(NSArray *)indexPaths {
+	[self deselectItemsAtIndexPaths:indexPaths animated:NO];
+	for (NSIndexPath *indexPath in indexPaths) {
+		BOOL sectionOutOfBounds = indexPath.jnw_section >= self.data.numberOfSections || indexPath.jnw_section < 0;
+		if (sectionOutOfBounds) continue;
+		JNWCollectionViewSection *section = &self.data.sections[(NSUInteger) indexPath.jnw_section];
+		BOOL itemOutOfBounds = indexPath.jnw_item >= section->numberOfItems || indexPath.jnw_item < 0;
+		if (itemOutOfBounds) continue;
+		[self selectItemAtIndexPath:indexPath animated:NO];
+	}
+	if (!self.selectedIndexes.count/* && !self.selectionCanBeEmpty*/) {
+		[self selectItemAtIndexPath:[NSIndexPath jnw_indexPathForItem:0 inSection:0] animated:NO];
+	}
+}
+
+- (void)animateUpdates:(void (^)(BOOL))completion {
 	if (self.willBeginBatchUpdates) {
 		return;
 	}
@@ -1388,7 +1406,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	
 	self.selectedIndexes = [self.selectedIndexes map:existingIndexPathMapping].mutableCopy;
 	[self.data recalculateAndPrepareLayout:YES];
-	//[self restoreSelectionIfPossible:self.selectedIndexes.copy];
+	[self restoreSelectionIfPossible:[self.selectedIndexes copy]];
 	
 	NSArray* visibleIndexPaths = self.indexPathsForVisibleItems;
 	
