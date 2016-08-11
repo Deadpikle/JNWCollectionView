@@ -1544,9 +1544,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	updates();
 	self.willBeginBatchUpdates = NO;
 	[self animateUpdates:completion];
-	
 }
-
 
 - (void)restoreSelectionIfPossible:(NSArray *)indexPaths {
 	[self deselectItemsAtIndexPaths:indexPaths animated:NO];
@@ -1575,18 +1573,18 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	}
 	
 	self.isAnimating = YES;
-	NSArray* insertedIndexPaths = [self.insertedItems sortedArrayUsingSelector:@selector(compare:)];
-	NSArray* deletedIndexPaths = self.deletedItems;
+	NSArray *insertedIndexPaths = [self.insertedItems sortedArrayUsingSelector:@selector(compare:)];
+	NSArray *deletedIndexPaths = self.deletedItems;
 	
 	// TODO: Use IndexSet?
 	NSIndexPath*(^existingIndexPathMapping)(NSIndexPath*) = ^NSIndexPath*(NSIndexPath* oldIndexPath) {
 		NSInteger newItem = oldIndexPath.jnw_item;
-		for (NSIndexPath* deletedIndexPath in deletedIndexPaths) {
+		for (NSIndexPath *deletedIndexPath in deletedIndexPaths) {
 			if (deletedIndexPath.jnw_section == oldIndexPath.jnw_section && oldIndexPath.jnw_item > deletedIndexPath.jnw_item) {
 				newItem--;
 			}
 		}
-		for(NSIndexPath* insertedIndexPath in insertedIndexPaths) {
+		for (NSIndexPath *insertedIndexPath in insertedIndexPaths) {
 			if (insertedIndexPath.jnw_section == oldIndexPath.jnw_section && newItem >= insertedIndexPath.jnw_item) {
 				newItem++;
 			}
@@ -1595,8 +1593,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	};
 	
 	
-	NSArray* deletedCells = [deletedIndexPaths map:^id (id indexPath)
-							 {
+	NSArray* deletedCells = [deletedIndexPaths map:^id (id indexPath) {
 								 JNWCollectionViewCell* cell = [self cellForItemAtIndexPath:indexPath];
 								 [self.visibleCellsMap removeObjectForKey:indexPath];
 								 return cell;
@@ -1609,7 +1606,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	
 	
 	
-	NSArray* sortedVisibleIndexPaths = [self.indexPathsForVisibleItems sortedArrayUsingSelector:@selector(compare:)] ;
+	NSArray *sortedVisibleIndexPaths = [self.indexPathsForVisibleItems sortedArrayUsingSelector:@selector(compare:)] ;
 	NSMutableSet *visibleIndexPathsWithoutDeletions = [NSMutableSet setWithArray:sortedVisibleIndexPaths];
 	[visibleIndexPathsWithoutDeletions minusSet:[NSSet setWithArray:deletedIndexPaths]];
 	NSSet *oldVisibleItems = [visibleIndexPathsWithoutDeletions map:existingIndexPathMapping];
@@ -1618,16 +1615,15 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	// Add existing cells that were not visible before
 	NSMutableSet* newVisibleItems = [NSMutableSet set];
 	
-	[NSAnimationContext runAnimationGroup:^(NSAnimationContext* context)
-	 {
+	[NSAnimationContext runAnimationGroup:^(NSAnimationContext* context) {
 		 // Animate in from the top
 		 NSIndexPath* oldFirstVisibleIndexPath = sortedVisibleIndexPaths.firstObject;
 		 NSInteger numberOfItemsToBeInsertedAtBeginning = existingIndexPathMapping(oldFirstVisibleIndexPath).jnw_item - oldFirstVisibleIndexPath.jnw_item;
 		 if (numberOfItemsToBeInsertedAtBeginning > 0) {
 			 for (NSUInteger i = 1; i <= numberOfItemsToBeInsertedAtBeginning; i++) {
-				 NSIndexPath* oldIndexPath = [NSIndexPath jnw_indexPathForItem:oldFirstVisibleIndexPath.jnw_item-i inSection:0];
+				 NSIndexPath *oldIndexPath = [NSIndexPath jnw_indexPathForItem:oldFirstVisibleIndexPath.jnw_item-i inSection:0];
 				 if (oldIndexPath.jnw_item < 0) continue;
-				 NSIndexPath* indexPath = existingIndexPathMapping(oldIndexPath);
+				 NSIndexPath *indexPath = existingIndexPathMapping(oldIndexPath);
 				 [self addCellForIndexPath:indexPath];
 				 JNWCollectionViewCell* cell = [self cellForItemAtIndexPath:indexPath];
 				 [self updateLayoutAttributesForCell:cell indexPath:oldIndexPath];
@@ -1645,8 +1641,8 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 				 
 				 if (![deletedIndexPaths containsObject:oldIndexPath]) {
 					 context.duration = 0;
-					 NSIndexPath* indexPath = existingIndexPathMapping(oldIndexPath);
-					 JNWCollectionViewCell* cell = [self addCellForIndexPath:indexPath];
+					 NSIndexPath *indexPath = existingIndexPathMapping(oldIndexPath);
+					 JNWCollectionViewCell *cell = [self addCellForIndexPath:indexPath];
 					 [self updateLayoutAttributesForCell:cell indexPath:oldIndexPath];
 					 [newVisibleItems addObject:indexPath];
 					 numberOfItemsToBeInsertedAtEnd--;
@@ -1660,11 +1656,11 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	[self.data recalculateAndPrepareLayout:YES];
 	[self restoreSelectionIfPossible:[self.selectedIndexes copy]];
 	
-	NSArray* visibleIndexPaths = self.indexPathsForVisibleItems;
+	NSArray *visibleIndexPaths = self.indexPathsForVisibleItems;
 	
 	[NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
 		context.duration = 0;
-		for(NSIndexPath* indexPath in insertedIndexPaths) {
+		for (NSIndexPath *indexPath in insertedIndexPaths) {
 			if ([visibleIndexPaths containsObject:indexPath]) {
 				[self addCellForIndexPath:indexPath];
 				JNWCollectionViewCell* cell = [self cellForItemAtIndexPath:indexPath];
@@ -1673,47 +1669,48 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		}
 	} completionHandler:NULL];
 	
-	NSMutableArray* indexPathsToBeRemoved = [NSMutableArray array];
-	NSSet* movingCells = [oldVisibleItems setByAddingObjectsFromSet:newVisibleItems];
+	NSMutableArray *indexPathsToBeRemoved = [NSMutableArray array];
+	NSSet *movingCells = [oldVisibleItems setByAddingObjectsFromSet:newVisibleItems];
 	
-	[NSAnimationContext runAnimationGroup:^(NSAnimationContext* context)
-	 {
+	[NSAnimationContext runAnimationGroup:^(NSAnimationContext* context) {
 		 context.allowsImplicitAnimation = YES;
 		 
-		 for (NSIndexPath* indexPath in movingCells) {
-			 JNWCollectionViewCell* cell = [self cellForItemAtIndexPath:indexPath];
+		 for (NSIndexPath *indexPath in movingCells) {
+			 JNWCollectionViewCell *cell = [self cellForItemAtIndexPath:indexPath];
 			 [self updateCell:cell forIndexPath:indexPath];
 			 [indexPathsToBeRemoved addObject:indexPath];
 			 
 		 }
 		 
-		 for(NSIndexPath* indexPath in insertedIndexPaths) {
+		 for(NSIndexPath *indexPath in insertedIndexPaths) {
 			 if ([visibleIndexPaths containsObject:indexPath]) {
-				 JNWCollectionViewCell* cell = [self cellForItemAtIndexPath:indexPath];
+				 JNWCollectionViewCell *cell = [self cellForItemAtIndexPath:indexPath];
 				 cell.alphaValue = 1;
 			 }
 		 }
 		 
-		 for (JNWCollectionViewCell* cell in deletedCells) {
+		 for (JNWCollectionViewCell *cell in deletedCells) {
 			 cell.alphaValue = 0;
 		 }
 		 
 	 } completionHandler:^ {
-		 NSArray* visibleItems = self.indexPathsForVisibleItems;
-		 for (NSIndexPath* indexPath in indexPathsToBeRemoved) {
-			 if (! [visibleItems containsObject:indexPath]) {
+		 NSArray *visibleItems = self.indexPathsForVisibleItems;
+		 for (NSIndexPath *indexPath in indexPathsToBeRemoved) {
+			 if (![visibleItems containsObject:indexPath]) {
 				 [self removeAndEnqueueCellAtIndexPath:indexPath];
 			 } else {
 				 [self updateSelectionStateOfCell:[self cellForItemAtIndexPath:indexPath]];
 			 }
 		 }
-		 for (JNWCollectionViewCell* cell in deletedCells) {
+		 for (JNWCollectionViewCell *cell in deletedCells) {
 			 cell.alphaValue = 1;
 			 [self enqueueReusableCell:cell withIdentifier:cell.reuseIdentifier];
 			 [cell setHidden:YES];
 		 }
 		 self.isAnimating = NO;
 		 [self layoutDocumentView];
+		 [self layoutCellsWithRedraw:YES]; // In Deadpikle's project, this was necessary to make items show up correctly on delete,
+										   // but in theory, it shouldn't be necessary. Not sure what the problem is yet...
 		 if (completion != NULL) {
 			 completion(YES);
 		 }
