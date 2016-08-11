@@ -1556,10 +1556,11 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		JNWCollectionViewSection *section = &self.data.sections[(NSUInteger) indexPath.jnw_section];
 		BOOL itemOutOfBounds = indexPath.jnw_item >= section->numberOfItems || indexPath.jnw_item < 0;
 		if (itemOutOfBounds) continue;
-		[self selectItemAtIndexPath:indexPath animated:NO];
+		[self selectItemAtIndexPath:indexPath atScrollPosition:JNWCollectionViewScrollPositionNone animated:NO];
 	}
 	if (!self.selectedIndexes.count/* && !self.selectionCanBeEmpty*/) {
-		[self selectItemAtIndexPath:[NSIndexPath jnw_indexPathForItem:0 inSection:0] animated:NO];
+		[self selectItemAtIndexPath:[NSIndexPath jnw_indexPathForItem:0 inSection:0]
+				   atScrollPosition:JNWCollectionViewScrollPositionNone animated:NO];
 	}
 }
 
