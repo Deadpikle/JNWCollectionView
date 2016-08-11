@@ -10,6 +10,8 @@
 **Note on branches for this fork:**
 > The develop branch is the merge of the cell-binding, drag-drop, and insert-delete branches. Each of those branches should be OK to merge from master individually as you need, but if you need/want all three, develop/merge from develop. Updates for each of those features should happen on the individual branches.
 
+> Credit for insert & delete goes to the wonderful fork of JNWCollectionView [here](https://github.com/chriseidhof/JNWCollectionView/tree/non-layer-backed). Keep in mind that the insert/delete code only works with 1 section at this point in time.
+
 ---
 
 `JNWCollectionView` is a modern collection view for the Mac with an extremely flexible API. Cells are dequeued and memory usage is kept at a minimum. The collection view is layer-backed by default, and performance is highly optimized.
