@@ -775,9 +775,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	if (needsVisibleRedraw || [self.collectionViewLayout shouldApplyExistingLayoutAttributesOnLayout]) {
 		for (NSIndexPath *indexPath in self.visibleCellsMap.allKeys) {
 			JNWCollectionViewCell *cell = self.visibleCellsMap[indexPath];
-			JNWCollectionViewLayoutAttributes *attributes = [self.collectionViewLayout layoutAttributesForItemAtIndexPath:indexPath];
-			
-			[self applyLayoutAttributes:attributes toCell:cell];
+			[self updateCell:cell forIndexPath:indexPath];
 		}
 	}
 	
@@ -1709,8 +1707,12 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		 }
 		 self.isAnimating = NO;
 		 [self layoutDocumentView];
-		 [self layoutCellsWithRedraw:YES]; // In Deadpikle's project, this was necessary to make items show up correctly on delete,
-										   // but in theory, it shouldn't be necessary. Not sure what the problem is yet...
+		 // In Deadpikle's project, this updateCell loop was necessary to make items show up correctly on delete,
+		 // but in theory, it shouldn't be necessary. Not sure what the problem is yet...
+		 for (NSIndexPath *indexPath in self.visibleCellsMap.allKeys) {
+			 JNWCollectionViewCell *cell = self.visibleCellsMap[indexPath];
+			 [self updateCell:cell forIndexPath:indexPath];
+		 }
 		 if (completion != NULL) {
 			 completion(YES);
 		 }
