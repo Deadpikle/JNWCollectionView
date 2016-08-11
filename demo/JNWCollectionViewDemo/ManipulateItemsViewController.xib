@@ -1,85 +1,111 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
-	<dependencies>
-		<deployment identifier="macosx"/>
-		<plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
-	</dependencies>
-	<objects>
-		<customObject id="-2" userLabel="File's Owner" customClass="ManipulateItemsViewController">
-			<connections>
-				<outlet property="collectionView" destination="EQM-u1-5dx" id="zyT-gp-gfU"/>
-				<outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
-			</connections>
-		</customObject>
-		<customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
-		<customObject id="-3" userLabel="Application" customClass="NSObject"/>
-		<customView id="Hz6-mo-xeY">
-			<rect key="frame" x="0.0" y="0.0" width="480" height="272"/>
-			<autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-			<subviews>
-				<scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EQM-u1-5dx" customClass="JNWCollectionView">
-					<rect key="frame" x="0.0" y="28" width="480" height="244"/>
-					<clipView key="contentView" id="EI2-XK-CRm">
-						<rect key="frame" x="1" y="1" width="463" height="227"/>
-						<autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-						<subviews>
-							<view fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rRv-LD-vft">
-								<rect key="frame" x="0.0" y="148" width="166" height="79"/>
-							</view>
-						</subviews>
-					</clipView>
-					<scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="krU-VY-Vq9">
-						<rect key="frame" x="1" y="228" width="463" height="15"/>
-						<autoresizingMask key="autoresizingMask"/>
-					</scroller>
-					<scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="F1Z-Nj-NVh">
-						<rect key="frame" x="464" y="1" width="15" height="227"/>
-						<autoresizingMask key="autoresizingMask"/>
-					</scroller>
-				</scrollView>
-				<button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZZf-yi-woK">
-					<rect key="frame" x="-6" y="-3" width="95" height="32"/>
-					<buttonCell key="cell" type="push" title="Add Item" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tLL-AG-CRr">
-						<behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-						<font key="font" metaFont="system"/>
-					</buttonCell>
-					<connections>
-						<action selector="addItem:" target="-2" id="xh2-Xc-cdg"/>
-					</connections>
-				</button>
-				<button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="H7r-7B-ZKv">
-					<rect key="frame" x="81" y="-3" width="119" height="32"/>
-					<buttonCell key="cell" type="push" title="Remove Item" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="rk1-i9-MjQ">
-						<behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-						<font key="font" metaFont="system"/>
-					</buttonCell>
-					<connections>
-						<action selector="removeItem:" target="-2" id="x5X-FQ-HKh"/>
-					</connections>
-				</button>
-				<button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kz2-cq-MXL">
-					<rect key="frame" x="195" y="-3" width="91" height="32"/>
-					<buttonCell key="cell" type="push" title="Clear All" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="H11-4W-ygg">
-						<behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-						<font key="font" metaFont="system"/>
-					</buttonCell>
-					<connections>
-						<action selector="clearAllItems:" target="-2" id="gAW-ho-QbD"/>
-					</connections>
-				</button>
-			</subviews>
-			<constraints>
-				<constraint firstItem="kz2-cq-MXL" firstAttribute="leading" secondItem="H7r-7B-ZKv" secondAttribute="trailing" constant="7" id="2wW-6p-NYs"/>
-				<constraint firstAttribute="bottom" secondItem="H7r-7B-ZKv" secondAttribute="bottom" constant="4" id="BeV-SE-ads"/>
-				<constraint firstItem="H7r-7B-ZKv" firstAttribute="leading" secondItem="ZZf-yi-woK" secondAttribute="trailing" constant="4" id="KA4-bo-30r"/>
-				<constraint firstItem="EQM-u1-5dx" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="Td4-x5-Raj"/>
-				<constraint firstItem="EQM-u1-5dx" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="ZV6-UW-D3c"/>
-				<constraint firstAttribute="trailing" secondItem="EQM-u1-5dx" secondAttribute="trailing" id="cag-t4-Cau"/>
-				<constraint firstAttribute="bottom" secondItem="ZZf-yi-woK" secondAttribute="bottom" constant="4" id="mT7-St-FGi"/>
-				<constraint firstAttribute="bottom" secondItem="EQM-u1-5dx" secondAttribute="bottom" constant="28" id="mxm-Cu-vsm"/>
-				<constraint firstAttribute="bottom" secondItem="kz2-cq-MXL" secondAttribute="bottom" constant="4" id="uue-Wg-bF7"/>
-				<constraint firstItem="ZZf-yi-woK" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="ydv-42-rPj"/>
-			</constraints>
-		</customView>
-	</objects>
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="ManipulateItemsViewController">
+            <connections>
+                <outlet property="collectionView" destination="EQM-u1-5dx" id="zyT-gp-gfU"/>
+                <outlet property="listView" destination="Wr0-bo-CEo" id="80M-bk-HDq"/>
+                <outlet property="view" destination="Hz6-mo-xeY" id="0bl-1N-x8E"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView id="Hz6-mo-xeY">
+            <rect key="frame" x="0.0" y="0.0" width="480" height="272"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EQM-u1-5dx" customClass="JNWCollectionView">
+                    <rect key="frame" x="0.0" y="28" width="240" height="244"/>
+                    <clipView key="contentView" id="EI2-XK-CRm">
+                        <rect key="frame" x="1" y="1" width="223" height="227"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rRv-LD-vft">
+                                <rect key="frame" x="0.0" y="148" width="166" height="79"/>
+                            </view>
+                        </subviews>
+                    </clipView>
+                    <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="krU-VY-Vq9">
+                        <rect key="frame" x="1" y="228" width="223" height="15"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                    <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="F1Z-Nj-NVh">
+                        <rect key="frame" x="224" y="1" width="15" height="227"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                </scrollView>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZZf-yi-woK">
+                    <rect key="frame" x="-6" y="-3" width="95" height="32"/>
+                    <buttonCell key="cell" type="push" title="Add Item" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tLL-AG-CRr">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="addItem:" target="-2" id="xh2-Xc-cdg"/>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="H7r-7B-ZKv">
+                    <rect key="frame" x="81" y="-3" width="119" height="32"/>
+                    <buttonCell key="cell" type="push" title="Remove Item" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="rk1-i9-MjQ">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="removeItem:" target="-2" id="x5X-FQ-HKh"/>
+                    </connections>
+                </button>
+                <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kz2-cq-MXL">
+                    <rect key="frame" x="195" y="-3" width="91" height="32"/>
+                    <buttonCell key="cell" type="push" title="Clear All" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="H11-4W-ygg">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="clearAllItems:" target="-2" id="gAW-ho-QbD"/>
+                    </connections>
+                </button>
+                <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wr0-bo-CEo" customClass="JNWCollectionView">
+                    <rect key="frame" x="240" y="28" width="240" height="244"/>
+                    <clipView key="contentView" id="7FT-kG-ubY">
+                        <rect key="frame" x="1" y="1" width="223" height="227"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6m9-zB-FSb">
+                                <rect key="frame" x="0.0" y="148" width="166" height="79"/>
+                            </view>
+                        </subviews>
+                    </clipView>
+                    <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="KVE-oc-MGF">
+                        <rect key="frame" x="1" y="228" width="223" height="15"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                    <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="iBu-hR-TU7">
+                        <rect key="frame" x="224" y="1" width="15" height="227"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </scroller>
+                </scrollView>
+            </subviews>
+            <constraints>
+                <constraint firstItem="kz2-cq-MXL" firstAttribute="leading" secondItem="H7r-7B-ZKv" secondAttribute="trailing" constant="7" id="2wW-6p-NYs"/>
+                <constraint firstAttribute="bottom" secondItem="H7r-7B-ZKv" secondAttribute="bottom" constant="4" id="BeV-SE-ads"/>
+                <constraint firstItem="EQM-u1-5dx" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="F2i-3B-rnd"/>
+                <constraint firstItem="H7r-7B-ZKv" firstAttribute="leading" secondItem="ZZf-yi-woK" secondAttribute="trailing" constant="4" id="KA4-bo-30r"/>
+                <constraint firstItem="EQM-u1-5dx" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="ZV6-UW-D3c"/>
+                <constraint firstItem="EQM-u1-5dx" firstAttribute="width" secondItem="Hz6-mo-xeY" secondAttribute="width" multiplier="1:2" id="d3n-tw-HFl"/>
+                <constraint firstItem="Wr0-bo-CEo" firstAttribute="width" secondItem="Hz6-mo-xeY" secondAttribute="width" multiplier="1:2" id="dog-3r-n5U"/>
+                <constraint firstAttribute="bottom" secondItem="Wr0-bo-CEo" secondAttribute="bottom" constant="28" id="jfe-J3-A1K"/>
+                <constraint firstAttribute="trailing" secondItem="Wr0-bo-CEo" secondAttribute="trailing" id="lHb-XR-9A9"/>
+                <constraint firstAttribute="bottom" secondItem="ZZf-yi-woK" secondAttribute="bottom" constant="4" id="mT7-St-FGi"/>
+                <constraint firstAttribute="bottom" secondItem="EQM-u1-5dx" secondAttribute="bottom" constant="28" id="mxm-Cu-vsm"/>
+                <constraint firstItem="Wr0-bo-CEo" firstAttribute="top" secondItem="Hz6-mo-xeY" secondAttribute="top" id="n7Q-IE-RMp"/>
+                <constraint firstAttribute="bottom" secondItem="kz2-cq-MXL" secondAttribute="bottom" constant="4" id="uue-Wg-bF7"/>
+                <constraint firstItem="ZZf-yi-woK" firstAttribute="leading" secondItem="Hz6-mo-xeY" secondAttribute="leading" id="ydv-42-rPj"/>
+            </constraints>
+        </customView>
+    </objects>
 </document>
