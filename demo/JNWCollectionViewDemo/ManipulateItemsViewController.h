@@ -9,6 +9,6 @@
 #import <Cocoa/Cocoa.h>
 #import <JNWCollectionView/JNWCollectionView.h>
 
-@interface ManipulateItemsViewController : NSViewController <JNWCollectionViewDelegate, JNWCollectionViewDataSource, JNWCollectionViewGridLayoutDelegate>
+@interface ManipulateItemsViewController : NSViewController <JNWCollectionViewDelegate, JNWCollectionViewDataSource, JNWCollectionViewGridLayoutDelegate, JNWCollectionViewListLayoutDelegate>
 
 @end

@@ -17,11 +17,14 @@
 @property (nonatomic, weak) IBOutlet JNWCollectionView *listView;
 @property (nonatomic, strong) NSMutableArray *items;
 @property (nonatomic, strong) NSMutableArray *listItems;
+@property (nonatomic, strong) NSMutableArray *rowHeights;
+
 @property NSUInteger listItemCounter;
 
 - (IBAction)addItem:(id)sender;
 - (IBAction)removeItem:(id)sender;
 - (IBAction)clearAllItems:(id)sender;
+- (IBAction)reloadTables:(id)sender;
 
 @end
 
@@ -38,9 +41,11 @@ static NSString * const listCellIdentifier = @"LISTCELL";
 	self.listItemCounter = 1;
 	self.items = [NSMutableArray array];
 	self.listItems = [NSMutableArray array];
+	self.rowHeights = [NSMutableArray array];
 	for (NSUInteger i = 0; i < 5; i++) {
 		[self.items addObject:[self generateSingleImage]];
 		[self.listItems addObject:[NSString stringWithFormat:@"%lu", (unsigned long)self.listItemCounter++]];
+		[self.rowHeights addObject:[NSNumber numberWithFloat:arc4random() % 50 + 20]];
 	}
 	
 	JNWCollectionViewGridLayout *gridLayout = [[JNWCollectionViewGridLayout alloc] init];
@@ -54,8 +59,9 @@ static NSString * const listCellIdentifier = @"LISTCELL";
 	[self.collectionView registerClass:GridCell.class forCellWithReuseIdentifier:identifier];
 	
 	JNWCollectionViewListLayout *listLayout = [[JNWCollectionViewListLayout alloc] init];
-	listLayout.rowHeight = 44.f;
-	//layout.delegate = self;
+	listLayout.rowHeight = 44.0f;
+	listLayout.delegate = self;
+	listLayout.verticalSpacing = 4.0f;
 	self.listView.collectionViewLayout = listLayout;
 	self.listView.delegate = self;
 	self.listView.dataSource = self;
@@ -100,6 +106,10 @@ static NSString * const listCellIdentifier = @"LISTCELL";
 	return CGSizeMake(100, 100);
 }
 
+- (CGFloat)collectionView:(JNWCollectionView *)collectionView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+	return [self.rowHeights[indexPath.jnw_item] floatValue];
+}
+
 #pragma mark Image creation
 
 - (NSImage *)generateSingleImage {
@@ -133,6 +143,7 @@ static NSString * const listCellIdentifier = @"LISTCELL";
 	[self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath jnw_indexPathForItem:0 inSection:0]]];
 	
 	[self.listItems insertObject:[NSString stringWithFormat:@"%lu", (unsigned long)self.listItemCounter++] atIndex:0];
+	[self.rowHeights insertObject:[NSNumber numberWithFloat:arc4random() % 50 + 20] atIndex:0];
 	[self.listView insertItemsAtIndexPaths:@[[NSIndexPath jnw_indexPathForItem:0 inSection:0]]];
 }
 
@@ -143,6 +154,7 @@ static NSString * const listCellIdentifier = @"LISTCELL";
 	}
 	if (self.listItems.count) {
 		[self.listItems removeObjectAtIndex:0];
+		[self.rowHeights removeObjectAtIndex:0];
 		[self.listView deleteItemsAtIndexPaths:@[[NSIndexPath jnw_indexPathForItem:0 inSection:0]]];
 	}
 }
@@ -162,7 +174,14 @@ static NSString * const listCellIdentifier = @"LISTCELL";
 			[indexPaths addObject:[NSIndexPath jnw_indexPathForItem:i inSection:0]];
 		}
 		[self.listItems removeAllObjects];
+		[self.rowHeights removeAllObjects];
 		[self.listView deleteItemsAtIndexPaths:indexPaths];
 	}
 }
+
+- (IBAction)reloadTables:(id)sender {
+	[self.collectionView reloadData];
+	[self.listView reloadData];
+}
+
 @end
