@@ -1647,80 +1647,73 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 				 }
 			 }
 		 }
-	 } completionHandler:NULL];
-	
-	
-	self.selectedIndexes = [self.selectedIndexes map:existingIndexPathMapping].mutableCopy;
-	[self.data recalculateAndPrepareLayout:YES];
-	[self restoreSelectionIfPossible:[self.selectedIndexes copy]];
-	
-	NSArray *visibleIndexPaths = self.indexPathsForVisibleItems;
-	
-	[NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
-		context.duration = 0;
-		for (NSIndexPath *indexPath in insertedIndexPaths) {
-			if ([visibleIndexPaths containsObject:indexPath]) {
-				[self addCellForIndexPath:indexPath];
-				JNWCollectionViewCell* cell = [self cellForItemAtIndexPath:indexPath];
-				cell.alphaValue = 0;
+	} completionHandler:^{self.selectedIndexes = [self.selectedIndexes map:existingIndexPathMapping].mutableCopy;
+		[self.data recalculateAndPrepareLayout:YES];
+		[self restoreSelectionIfPossible:[self.selectedIndexes copy]];
+		
+		NSArray *visibleIndexPaths = self.indexPathsForVisibleItems;
+		
+		[NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
+			context.duration = 0;
+			for (NSIndexPath *indexPath in insertedIndexPaths) {
+				if ([visibleIndexPaths containsObject:indexPath]) {
+					[self addCellForIndexPath:indexPath];
+					JNWCollectionViewCell* cell = [self cellForItemAtIndexPath:indexPath];
+					cell.alphaValue = 0;
+				}
 			}
-		}
-	} completionHandler:NULL];
-	
-	NSMutableArray *indexPathsToBeRemoved = [NSMutableArray array];
-	NSSet *movingCells = [oldVisibleItems setByAddingObjectsFromSet:newVisibleItems];
-	
-	[NSAnimationContext runAnimationGroup:^(NSAnimationContext* context) {
-		 context.allowsImplicitAnimation = YES;
-		 
-		 for (NSIndexPath *indexPath in movingCells) {
-			 JNWCollectionViewCell *cell = [self cellForItemAtIndexPath:indexPath];
-			 [self updateCell:cell forIndexPath:indexPath];
-			 [indexPathsToBeRemoved addObject:indexPath];
-			 
-		 }
-		 
-		 for(NSIndexPath *indexPath in insertedIndexPaths) {
-			 if ([visibleIndexPaths containsObject:indexPath]) {
-				 JNWCollectionViewCell *cell = [self cellForItemAtIndexPath:indexPath];
-				 cell.alphaValue = 1;
-			 }
-		 }
-		 
-		 for (JNWCollectionViewCell *cell in deletedCells) {
-			 cell.alphaValue = 0;
-		 }
-		 
-	 } completionHandler:^ {
-		 NSArray *visibleItems = self.indexPathsForVisibleItems;
-		 for (NSIndexPath *indexPath in indexPathsToBeRemoved) {
-			 if (![visibleItems containsObject:indexPath]) {
-				 [self removeAndEnqueueCellAtIndexPath:indexPath];
-			 } else {
-				 [self updateSelectionStateOfCell:[self cellForItemAtIndexPath:indexPath]];
-			 }
-		 }
-		 for (JNWCollectionViewCell *cell in deletedCells) {
-			 cell.alphaValue = 1;
-			 [self enqueueReusableCell:cell withIdentifier:cell.reuseIdentifier];
-			 [cell setHidden:YES];
-		 }
-		 self.isAnimating = NO;
-		 [self layoutDocumentView];
-		 // In Deadpikle's project, this updateCell loop was necessary to make items show up correctly on delete,
-		 // but in theory, it shouldn't be necessary. Not sure what the problem is yet...
-		 /*for (NSIndexPath *indexPath in self.visibleCellsMap.allKeys) {
-			 JNWCollectionViewCell *cell = self.visibleCellsMap[indexPath];
-			 [self updateCell:cell forIndexPath:indexPath];
-		 }*/
-		 [self layoutCellsWithRedraw:YES];
-		 if (completion != NULL) {
-			 completion(YES);
-		 }
-	 }];
-	
-	[self.insertedItems removeAllObjects];
-	[self.deletedItems removeAllObjects];
+		} completionHandler:^{
+			NSMutableArray *indexPathsToBeRemoved = [NSMutableArray array];
+			NSSet *movingCells = [oldVisibleItems setByAddingObjectsFromSet:newVisibleItems];
+			
+			[NSAnimationContext runAnimationGroup:^(NSAnimationContext* context) {
+				 context.allowsImplicitAnimation = YES;
+				 
+				 for (NSIndexPath *indexPath in movingCells) {
+					 JNWCollectionViewCell *cell = [self cellForItemAtIndexPath:indexPath];
+					 [self updateCell:cell forIndexPath:indexPath];
+					 [indexPathsToBeRemoved addObject:indexPath];
+					 
+				 }
+				 
+				 for(NSIndexPath *indexPath in insertedIndexPaths) {
+					 if ([visibleIndexPaths containsObject:indexPath]) {
+						 JNWCollectionViewCell *cell = [self cellForItemAtIndexPath:indexPath];
+						 cell.alphaValue = 1;
+					 }
+				 }
+				 
+				 for (JNWCollectionViewCell *cell in deletedCells) {
+					 cell.alphaValue = 0;
+				 }
+				 
+			 } completionHandler:^ {
+				 NSArray *visibleItems = self.indexPathsForVisibleItems;
+				 for (NSIndexPath *indexPath in indexPathsToBeRemoved) {
+					 if (![visibleItems containsObject:indexPath]) {
+						 [self removeAndEnqueueCellAtIndexPath:indexPath];
+					 } else {
+						 [self updateSelectionStateOfCell:[self cellForItemAtIndexPath:indexPath]];
+					 }
+				 }
+				 for (JNWCollectionViewCell *cell in deletedCells) {
+					 cell.alphaValue = 1;
+					 [self enqueueReusableCell:cell withIdentifier:cell.reuseIdentifier];
+					 [cell setHidden:YES];
+				 }
+				 self.isAnimating = NO;
+				 [self layoutDocumentView];
+				 // In theory, this layoutCellsWithRedraw: call shouldn't be necessary. Not sure what the problem is yet...
+				 [self layoutCellsWithRedraw:YES];
+				 if (completion != NULL) {
+					 completion(YES);
+				 }
+			 }];
+			
+			[self.insertedItems removeAllObjects];
+			[self.deletedItems removeAllObjects];
+		}];
+	}];
 }
 
 
