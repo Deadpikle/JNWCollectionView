@@ -117,6 +117,7 @@ static NSString * const identifier = @"CELL";
 		for (NSUInteger i = 0; i < self.items.count; i++) {
 			[indexPaths addObject:[NSIndexPath jnw_indexPathForItem:i inSection:0]];
 		}
+		[self.items removeAllObjects];
 		[self.collectionView deleteItemsAtIndexPaths:indexPaths];
 	}
 }
