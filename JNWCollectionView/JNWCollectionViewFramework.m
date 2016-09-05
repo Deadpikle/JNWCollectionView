@@ -1416,7 +1416,12 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		[self updateDropMarker];
 	}
 	
-	return _dragContext.dropPath ? NSDragOperationGeneric : NSDragOperationNone;
+	if (([sender draggingSourceOperationMask] & NSDragOperationGeneric) != 0) {
+		return NSDragOperationGeneric;
+	}
+	else {
+		return NSDragOperationNone;
+	}
 }
 
 - (void)draggingExited:(id<NSDraggingInfo>)sender {
@@ -1443,7 +1448,6 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 
 - (BOOL)performDragOperation:(id<NSDraggingInfo>)sender {
 	BOOL result = NO;
-	
 	if (self.dragContext) {
 		NSArray *fromIndexPath = self.dragContext.dragPaths;
 		JNWCollectionViewDropIndexPath *toIndexPath = self.dragContext.dropPath;
