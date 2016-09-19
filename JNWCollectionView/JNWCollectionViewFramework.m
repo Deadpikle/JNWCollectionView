@@ -1048,6 +1048,9 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	if (!self.sendsMultipleSelectionCalls && _collectionViewFlags.delegateDidDeselectMult) {
 		[self.delegate collectionView:self didDeselectItemsAtIndexPaths:[NSSet setWithArray:indexPaths]];
 	}
+	if (_collectionViewFlags.delegateDidSelectItemsChange) {
+		[self.delegate collectionView:self selectedItemsChangedToIndexPaths:[NSSet setWithArray:indexPaths]];
+	}
 }
 
 - (void)selectItemsAtIndexPaths:(NSArray *)indexPaths animated:(BOOL)animated {
@@ -1056,6 +1059,9 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	}
 	if (!self.sendsMultipleSelectionCalls && _collectionViewFlags.delegateDidSelectMult) {
 		[self.delegate collectionView:self didSelectItemsAtIndexPaths:[NSSet setWithArray:indexPaths]];
+	}
+	if (_collectionViewFlags.delegateDidSelectItemsChange) {
+		[self.delegate collectionView:self selectedItemsChangedToIndexPaths:[NSSet setWithArray:indexPaths]];
 	}
 }
 
