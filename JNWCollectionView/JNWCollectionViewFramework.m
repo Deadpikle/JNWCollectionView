@@ -1049,7 +1049,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		[self.delegate collectionView:self didDeselectItemsAtIndexPaths:[NSSet setWithArray:indexPaths]];
 	}
 	if (_collectionViewFlags.delegateDidSelectItemsChange) {
-		[self.delegate collectionView:self selectedItemsChangedToIndexPaths:[NSSet setWithArray:indexPaths]];
+		[self.delegate collectionView:self selectedItemsChangedToIndexPaths:[NSSet setWithArray:[self selectedIndexes]]];
 	}
 }
 
