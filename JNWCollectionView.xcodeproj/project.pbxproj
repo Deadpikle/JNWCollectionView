@@ -305,8 +305,8 @@
 		ABB023E8170791D300537A92 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastTestingUpgradeCheck = 0640;
-				LastUpgradeCheck = 0800;
+				LastTestingUpgradeCheck = 0610;
+				LastUpgradeCheck = 0810;
 				ORGANIZATIONNAME = AppJon;
 			};
 			buildConfigurationList = ABB023EB170791D300537A92 /* Build configuration list for PBXProject "JNWCollectionView" */;
