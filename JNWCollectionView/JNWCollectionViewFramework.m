@@ -1404,13 +1404,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		// We've got a drag operation from outside the app.
 		_dragContext = [[JNWCollectionViewDragContext alloc] init];
 	}
-	
-	if (([sender draggingSourceOperationMask] & NSDragOperationGeneric) != 0) {
-		return NSDragOperationGeneric;
-	}
-	else {
-		return NSDragOperationNone;
-	}
+	return [sender draggingSourceOperationMask];
 }
 
 - (NSDragOperation)draggingUpdated:(id<NSDraggingInfo>)sender {
@@ -1425,15 +1419,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		[self.collectionViewLayout prepareLayout];
 		[self updateDropMarker];
 	}
-	
-	if (([sender draggingSourceOperationMask] & NSDragOperationGeneric) != 0) {
-		//NSLog(@"Generic");
-		return NSDragOperationGeneric;
-	}
-	else {
-		//NSLog(@"Not generic");
-		return NSDragOperationNone;
-	}
+	return [sender draggingSourceOperationMask];
 }
 
 - (void)draggingExited:(id<NSDraggingInfo>)sender {
