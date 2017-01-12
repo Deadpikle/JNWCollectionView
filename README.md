@@ -8,9 +8,9 @@
 ---
 
 **Note on branches for this fork:**
-> The develop branch is the merge of the cell-binding, drag-drop, and insert-delete branches. Each of those branches should be OK to merge from master individually as you need, but if you need/want all three, develop/merge from develop. Updates for each of those features should happen on the individual branches.
+> The develop branch is the merge of the drag-drop and insert-delete branches. Each of those branches should be OK to merge from master individually as you need, but if you need/want them all, develop/merge from develop. Updates for each of those features should happen on the individual branches. The develop branch has some additional features that aren't in the other, individual feature branches.
 
-> Credit for insert & delete goes to the wonderful fork of JNWCollectionView [here](https://github.com/chriseidhof/JNWCollectionView/tree/non-layer-backed). Keep in mind that the insert/delete code only works with 1 section at this point in time.
+> Credit for insert & delete goes to the wonderful fork of JNWCollectionView [here](https://github.com/chriseidhof/JNWCollectionView/tree/non-layer-backed). Keep in mind that the insert/delete code only works with 1 section at this point in time. It seemed to work OK in the demo, but it had issues in my work project for unknown reasons.
 
 ---
 
