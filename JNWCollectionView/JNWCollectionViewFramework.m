@@ -306,7 +306,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 
 - (id)firstTopLevelObjectOfClass:(Class)objectClass inNib:(NSNib *)nib topLevelObjects:(NSArray**)objects {
 	id foundObject = nil;
-	if([nib instantiateWithOwner:self topLevelObjects:objects]) {
+	if ([nib instantiateWithOwner:self topLevelObjects:objects]) {
 		NSUInteger objectIndex = [*objects indexOfObjectPassingTest:^BOOL(id obj, NSUInteger idx, BOOL *stop) {
 			if ([obj isKindOfClass:objectClass]) {
 				*stop = YES;
@@ -354,6 +354,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	
 	cell.reuseIdentifier = identifier;
 	[cell prepareForReuse];
+	[cell setMenu:[[NSMenu alloc] init]];
 	return cell;
 }
 
@@ -1398,7 +1399,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 }
 
 - (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender {
-	NSLog(@"Dragging entered");
+	//NSLog(@"Dragging entered");
 	if (!self.dragContext) {
 		// We've got a drag operation from outside the app.
 		_dragContext = [[JNWCollectionViewDragContext alloc] init];
@@ -1413,7 +1414,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 }
 
 - (NSDragOperation)draggingUpdated:(id<NSDraggingInfo>)sender {
-	NSLog(@"Dragging updated");
+	//NSLog(@"Dragging updated");
 	NSPoint windowPoint = [sender draggingLocation];
 	NSPoint viewPoint = [self.documentView convertPoint:windowPoint fromView:nil];
 	JNWCollectionViewDropIndexPath *dropPath = [_collectionViewLayout dropIndexPathAtPoint:viewPoint];
@@ -1426,17 +1427,17 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	}
 	
 	if (([sender draggingSourceOperationMask] & NSDragOperationGeneric) != 0) {
-		NSLog(@"Generic");
+		//NSLog(@"Generic");
 		return NSDragOperationGeneric;
 	}
 	else {
-		NSLog(@"Not generic");
+		//NSLog(@"Not generic");
 		return NSDragOperationNone;
 	}
 }
 
 - (void)draggingExited:(id<NSDraggingInfo>)sender {
-	NSLog(@"Dragging exited");
+	//NSLog(@"Dragging exited");
 	// Drag has left the view. If it was an external drag operation, clean up
 	// the context.
 	if (!_dragContext.dragPaths) {
@@ -1447,7 +1448,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 }
 
 - (void)draggingSession:(NSDraggingSession *)session endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation {
-	NSLog(@"Dragging ended at point");
+	//NSLog(@"Dragging ended at point");
 	if (self.dragContext) {
 		_dragContext = nil;
 		[self.collectionViewLayout prepareLayout];
@@ -1461,7 +1462,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 
 - (BOOL)performDragOperation:(id<NSDraggingInfo>)sender {
 	BOOL result = NO;
-	NSLog(@"Perform drag operation");
+	//NSLog(@"Perform drag operation");
 	if (self.dragContext) {
 		NSArray *fromIndexPath = self.dragContext.dragPaths;
 		JNWCollectionViewDropIndexPath *toIndexPath = self.dragContext.dropPath;
@@ -1508,7 +1509,11 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 - (BOOL)wantsPeriodicDraggingUpdates {
 	return YES;
 }
-        
+
+- (void)menuNeedsUpdate:(NSMenu *)menu {
+	
+}
+
 - (NSMenu *)menuForEvent:(NSEvent *)event {
 	if (_collectionViewFlags.delegateMenuForEvent) {
 		NSMenu *menu = [self.delegate collectionView:self menuForEvent:event];
