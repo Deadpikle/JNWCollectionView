@@ -1404,7 +1404,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		// We've got a drag operation from outside the app.
 		_dragContext = [[JNWCollectionViewDragContext alloc] init];
 	}
-	return [sender draggingSourceOperationMask];
+	return [sender draggingSourceOperationMask]; // we're only supposed to return 1 NSDragOperation, but this could potentially return multiple. TODO:
 }
 
 - (NSDragOperation)draggingUpdated:(id<NSDraggingInfo>)sender {
@@ -1419,7 +1419,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		[self.collectionViewLayout prepareLayout];
 		[self updateDropMarker];
 	}
-	return [sender draggingSourceOperationMask];
+	return [sender draggingSourceOperationMask]; // we're only supposed to return 1 NSDragOperation, but this could potentially return multiple. TODO:
 }
 
 - (void)draggingExited:(id<NSDraggingInfo>)sender {
