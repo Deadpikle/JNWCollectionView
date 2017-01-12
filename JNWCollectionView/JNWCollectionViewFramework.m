@@ -1397,6 +1397,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 }
 
 - (NSDragOperation)draggingEntered:(id<NSDraggingInfo>)sender {
+	NSLog(@"Dragging entered");
 	if (!self.dragContext) {
 		// We've got a drag operation from outside the app.
 		_dragContext = [[JNWCollectionViewDragContext alloc] init];
@@ -1411,6 +1412,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 }
 
 - (NSDragOperation)draggingUpdated:(id<NSDraggingInfo>)sender {
+	NSLog(@"Dragging updated");
 	NSPoint windowPoint = [sender draggingLocation];
 	NSPoint viewPoint = [self.documentView convertPoint:windowPoint fromView:nil];
 	JNWCollectionViewDropIndexPath *dropPath = [_collectionViewLayout dropIndexPathAtPoint:viewPoint];
@@ -1423,14 +1425,17 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	}
 	
 	if (([sender draggingSourceOperationMask] & NSDragOperationGeneric) != 0) {
+		NSLog(@"Generic");
 		return NSDragOperationGeneric;
 	}
 	else {
+		NSLog(@"Not generic");
 		return NSDragOperationNone;
 	}
 }
 
 - (void)draggingExited:(id<NSDraggingInfo>)sender {
+	NSLog(@"Dragging exited");
 	// Drag has left the view. If it was an external drag operation, clean up
 	// the context.
 	if (!_dragContext.dragPaths) {
@@ -1441,6 +1446,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 }
 
 - (void)draggingSession:(NSDraggingSession *)session endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation {
+	NSLog(@"Dragging ended at point");
 	if (self.dragContext) {
 		_dragContext = nil;
 		[self.collectionViewLayout prepareLayout];
@@ -1454,6 +1460,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 
 - (BOOL)performDragOperation:(id<NSDraggingInfo>)sender {
 	BOOL result = NO;
+	NSLog(@"Perform drag operation");
 	if (self.dragContext) {
 		NSArray *fromIndexPath = self.dragContext.dragPaths;
 		JNWCollectionViewDropIndexPath *toIndexPath = self.dragContext.dropPath;

@@ -265,7 +265,9 @@
     if ([key isEqualToString:@"objectValue"]) {
         self.objectValue = value;
     }
-    [super setValue:value forKey:key];
+	if (value) {
+		[super setValue:value forKey:key];
+	}
 }
 
 @end
