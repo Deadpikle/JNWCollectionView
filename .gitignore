@@ -16,3 +16,5 @@ DerivedData
 .idea/
 *.hmap
 *.xccheckout
+demo/JNWCollectionViewDemo.xcodeproj/project.xcworkspace/xcshareddata/
+
