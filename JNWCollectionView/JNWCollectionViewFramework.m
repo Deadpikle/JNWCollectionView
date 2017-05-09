@@ -856,9 +856,9 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		cell.objectValue = [self.delegate collectionView:self objectValueForItemAtIndexPath:indexPath];
 	}
 	
-	[self updateSelectionStateOfCell:cell];
-	
 	self.visibleCellsMap[indexPath] = cell;
+	
+	[self updateSelectionStateOfCell:cell];
 	
 	return cell;
 }
@@ -1184,10 +1184,10 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	
 	[self selectItemsAtIndexPaths:indexesToSelect.allObjects animated:animated];
 	[self deselectItemsAtIndexPaths:indexesToDeselect.allObjects animated:animated];
+	[self scrollToItemAtIndexPath:indexPath atScrollPosition:scrollPosition animated:animated];
 	if (_collectionViewFlags.delegateDidSelectItemsChange) {
 		[self.delegate collectionView:self selectedItemsChangedToIndexPaths:[NSSet setWithArray:self.selectedIndexes]];
 	}
-	[self scrollToItemAtIndexPath:indexPath atScrollPosition:scrollPosition animated:animated];
 }
 
 - (void)mouseDownInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event {
