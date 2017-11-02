@@ -389,5 +389,10 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewScrollPosition) {
 - (void)deleteItemsAtIndexPaths:(NSArray<NSIndexPath*> *)deletedIndexPaths;
 - (void)reloadItemsAtIndexPaths:(NSArray<NSIndexPath*> *)reloadedIndexPaths;
 - (void)performBatchUpdates:(void (^)(void))updates completion:(void (^)(BOOL finished))completion;
+    
+#pragma mark - Other
+    
+- (void)mouseDownInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event;
+- (void)mouseUpInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event;
 
 @end
