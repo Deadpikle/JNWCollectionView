@@ -1245,6 +1245,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		NSIndexPath *indexPath = [self indexPathForCell:cell];
 		[self.delegate collectionView:self mouseMovedInItemAtIndexPath:indexPath withEvent:event];
 	}
+    cell.hovered = YES;
 }
 
 - (void)mouseEnteredInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event {
@@ -1253,8 +1254,10 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		[self.delegate collectionView:self mouseEnteredInItemAtIndexPath:indexPath withEvent:event];
 	}
 	
-	[[self.visibleCellsMap allValues] enumerateObjectsUsingBlock:^(JNWCollectionViewCell *cell, NSUInteger index, BOOL *stop) {
-		cell.hovered = NO;
+	[[self.visibleCellsMap allValues] enumerateObjectsUsingBlock:^(JNWCollectionViewCell *innerCell, NSUInteger index, BOOL *stop) {
+        if (cell != innerCell) {
+            innerCell.hovered = NO;
+        }
 	}];
 	cell.hovered = YES;
 }
