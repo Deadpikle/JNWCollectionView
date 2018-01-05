@@ -150,6 +150,9 @@ static const CGSize JNWCollectionViewGridLayoutDefaultSize = (CGSize){ 44.f, 44.
         if ([self.delegate respondsToSelector:@selector(sizeForItemInCollectionView:)]) {
             itemSize = [self.delegate sizeForItemInCollectionView:self.collectionView];
         }
+        else if (self.itemSize.width != itemSize.width || self.itemSize.height != itemSize.height) {
+            itemSize = self.itemSize;
+        }
         NSUInteger numberOfColumns = totalWidth / (itemSize.width + self.itemHorizontalMargin);
         if (numberOfColumns == 0) {
             numberOfColumns = 1;
