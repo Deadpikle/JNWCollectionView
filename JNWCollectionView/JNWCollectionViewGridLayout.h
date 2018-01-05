@@ -35,6 +35,8 @@ extern NSString * const JNWCollectionViewGridLayoutFooterKind;
 /// If this method is implemented, `itemSize` will be set to returned values.
 - (CGSize)sizeForItemInCollectionView:(JNWCollectionView *)collectionView;
 
+- (CGSize)sizeForItemInCollectionView:(JNWCollectionView *)collectionView forSection:(NSUInteger)section;
+
 /// Asks the delegate for the height of the header or footer in the specified section.
 ///
 /// The default height for both the header and footer is 0.
@@ -61,6 +63,9 @@ extern NSString * const JNWCollectionViewGridLayoutFooterKind;
 /// Any values returned from the delegate method -sizeForItemInCollectionView: will
 /// override any value set here.
 @property (nonatomic, assign) CGSize itemSize;
+
+/// An array of CGSize so that each _section_ can have its own item size
+@property (nonatomic) NSArray<NSValue*> *itemSizes;
 
 /// Choose whether even padding between horizontal items is enabled.
 ///
