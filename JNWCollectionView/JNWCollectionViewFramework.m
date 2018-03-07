@@ -1367,37 +1367,41 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
         NSIndexPath *indexPath = [self indexPathForCell:cell];
         [self.delegate collectionView:self mouseDraggedInItemAtIndexPath:indexPath withEvent:event];
     }
-	if (self.dragDropDelegate) {
-		NSMutableArray *dragItems = [NSMutableArray arrayWithCapacity:self.selectedIndexes.count];
-		if (_collectionViewFlags.dragDropDelegateAllowsDragDrop && ![self.dragDropDelegate collectionView:self shouldAllowDragDropForIndices:self.selectedIndexes]) {
-			return;
-		}
-		for (NSIndexPath *indexPath in self.selectedIndexes) {
-			id<NSPasteboardWriting> pasteboardWriter = [self.dragDropDelegate collectionView:self pasteboardWriterForItemAtIndexPath:indexPath];
-			if (pasteboardWriter == nil) {
-				continue;
-			}
-			
-			JNWCollectionViewCell *cell = [self cellForItemAtIndexPath:indexPath];
-			NSDraggingItem *dragItem = [[NSDraggingItem alloc] initWithPasteboardWriter:pasteboardWriter];
-			dragItem.draggingFrame = [self convertRect:cell.frame fromView:self.documentView];
-			dragItem.imageComponentsProvider = ^ {
-				NSImage *image = cell.draggingImageRepresentation;
-				NSSize size = image.size;
-				NSDraggingImageComponent *component = [[NSDraggingImageComponent alloc] initWithKey:NSDraggingImageComponentIconKey];
-				component.contents = image;
-				component.frame = NSMakeRect(0, 0, size.width, size.height);
-				return @[ component ];
-			};
-			[dragItems addObject:dragItem];
-		}
-		
-		_dragContext = [[JNWCollectionViewDragContext alloc] init];
-		[self.dragContext setDragPaths:[self.selectedIndexes copy]];
-		
-		if (![self beginDraggingSessionWithItems:dragItems event:event source:self]) {
-			_dragContext = nil;
-		}
+    if (self.dragDropDelegate) {
+        // for some reason on El Capitan, this function is called 2x for 2 drag operations. On High Sierra, this is
+        // only called once. Strange...
+        BOOL didDragContextAlreadyExist = _dragContext != nil;
+        if (!didDragContextAlreadyExist) {
+            NSMutableArray *dragItems = [NSMutableArray arrayWithCapacity:self.selectedIndexes.count];
+            if (_collectionViewFlags.dragDropDelegateAllowsDragDrop && ![self.dragDropDelegate collectionView:self shouldAllowDragDropForIndices:self.selectedIndexes]) {
+                return;
+            }
+            for (NSIndexPath *indexPath in self.selectedIndexes) {
+                id<NSPasteboardWriting> pasteboardWriter = [self.dragDropDelegate collectionView:self pasteboardWriterForItemAtIndexPath:indexPath];
+                if (pasteboardWriter == nil) {
+                    continue;
+                }
+                
+                JNWCollectionViewCell *cell = [self cellForItemAtIndexPath:indexPath];
+                NSDraggingItem *dragItem = [[NSDraggingItem alloc] initWithPasteboardWriter:pasteboardWriter];
+                dragItem.draggingFrame = [self convertRect:cell.frame fromView:self.documentView];
+                dragItem.imageComponentsProvider = ^ {
+                    NSImage *image = cell.draggingImageRepresentation;
+                    NSSize size = image.size;
+                    NSDraggingImageComponent *component = [[NSDraggingImageComponent alloc] initWithKey:NSDraggingImageComponentIconKey];
+                    component.contents = image;
+                    component.frame = NSMakeRect(0, 0, size.width, size.height);
+                    return @[ component ];
+                };
+                [dragItems addObject:dragItem];
+            }
+            
+            _dragContext = [[JNWCollectionViewDragContext alloc] init];
+            [self.dragContext setDragPaths:[self.selectedIndexes copy]];
+            if (![self beginDraggingSessionWithItems:dragItems event:event source:self]) {
+                _dragContext = nil;
+            }
+        }
 	}
 }
 
