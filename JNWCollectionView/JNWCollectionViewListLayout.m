@@ -321,14 +321,34 @@ NSString * const JNWCollectionViewListLayoutFooterKind = @"JNWCollectionViewList
      */
     
     NSArray *visibleCells = [self.collectionView visibleCells];
+    CGFloat halfVerticalSpacing = self.verticalSpacing * 0.5; // calculate this above loop since it is always constant
     for (JNWCollectionViewCell *cell in visibleCells) {
+        // run a basic check to see if the point is within the actual cell's frame without accounting
+        // for vertical spacing
         if (CGRectContainsPoint(cell.frame, point)) {
-            NSIndexPath *path = [self.collectionView indexPathForCell:cell];
+            NSIndexPath *path = cell.indexPath;
             if (path) {
                 if (point.y <= cell.frame.origin.y + cell.frame.size.height * 0.5) {
                     return [JNWCollectionViewDropIndexPath indexPathForItem:path.jnw_item inSection:path.jnw_section dropRelation:JNWCollectionViewDropRelationAt];
                 } else {
                     return [JNWCollectionViewDropIndexPath indexPathForItem:path.jnw_item inSection:path.jnw_section dropRelation:JNWCollectionViewDropRelationAfter];
+                }
+            }
+        }
+        else {
+            // We may need to account for vertical spacing to know which cell is being dropped on
+            CGRect rectWithSpacing = cell.frame;
+            // see if the drag operation is "between" cells by being "below" the cell
+            rectWithSpacing.size.height += halfVerticalSpacing;
+            if (CGRectContainsPoint(rectWithSpacing, point)) {
+                return [JNWCollectionViewDropIndexPath indexPathForItem:cell.indexPath.jnw_item inSection:cell.indexPath.jnw_section dropRelation:JNWCollectionViewDropRelationAfter];
+            }
+            if (cell.indexPath.jnw_item != 0) {
+                // see if the drag operation is "between" cells by being "above" the cell
+                // (cell 0 can't have an "above" the cell since it is at the top and the verticalSpacing doesn't account for this)
+                rectWithSpacing.origin.y -= halfVerticalSpacing;
+                if (CGRectContainsPoint(rectWithSpacing, point)) {
+                    return [JNWCollectionViewDropIndexPath indexPathForItem:cell.indexPath.jnw_item inSection:cell.indexPath.jnw_section dropRelation:JNWCollectionViewDropRelationAt];
                 }
             }
         }
