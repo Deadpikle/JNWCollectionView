@@ -1423,7 +1423,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	//NSLog(@"Dragging updated");
 	NSPoint windowPoint = [sender draggingLocation];
 	NSPoint viewPoint = [self.documentView convertPoint:windowPoint fromView:nil];
-	JNWCollectionViewDropIndexPath *dropPath = [_collectionViewLayout dropIndexPathAtPoint:viewPoint];
+	JNWCollectionViewDropIndexPath *dropPath = [self.collectionViewLayout dropIndexPathAtPoint:viewPoint];
 	
 	// Check whether the drop path has changed. Avoid repeated calls when both the old and new path are nil.
 	if (![self.dragContext.dropPath isEqual:dropPath] && !(dropPath == nil && _dragContext.dropPath == nil)) {
