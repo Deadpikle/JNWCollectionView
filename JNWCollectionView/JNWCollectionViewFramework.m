@@ -1196,6 +1196,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 }
 
 - (void)mouseDownInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event {
+    NSLog(@"Mouse down");
     NSIndexPath *indexPath = [self indexPathForCell:cell];
     if (indexPath == nil) {
         NSLog(@"***index path not found for selection.");
@@ -1209,21 +1210,16 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 #pragma clang diagnostic pop
 	}
     [self.window makeFirstResponder:self];
-    
-    // Detect if modifier flags are held down.
-    // We prioritize the command key over the shift key.
-    BOOL isSingleSelect = YES;
-    if (self.allowsMultipleSelection) {
-        if (event.modifierFlags & NSCommandKeyMask) {
-            [self selectItemAtIndexPath:indexPath atScrollPosition:JNWCollectionViewScrollPositionNearest animated:YES selectionType:JNWCollectionViewSelectionTypeMultiple];
-            isSingleSelect = NO;
-        } else if (event.modifierFlags & NSShiftKeyMask) {
-            [self selectItemAtIndexPath:indexPath atScrollPosition:JNWCollectionViewScrollPositionNearest animated:YES selectionType:JNWCollectionViewSelectionTypeExtending];
-            isSingleSelect = NO;
-        }
-    }
-    if (isSingleSelect) {
-        [self selectItemAtIndexPath:indexPath atScrollPosition:JNWCollectionViewScrollPositionNearest animated:YES];
+    // If we don't already have this item selected, handle the selection by selecting the item.
+    // Otherwise, we don't want to handle the selection, as the user may be performing a drag operation.
+    // If the user wants to select just one slide, they simply have to click on the already-selected item
+    // and the mouse up handler will handle the selection change.
+    // Mouse-up will always handle the selection change.
+    // Without handling it here in mouse down for unselected items, we would be able to start a drag
+    // operation for selected cell #3 by starting to drag unselected cell #5 (or similar), which
+    // is not what the user expects.
+    if (![self.selectedIndexes containsObject:indexPath]) {
+        [self handleMouseDownUpEvent:event forIndexPath:indexPath];
     }
 }
 
@@ -1243,6 +1239,25 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		[self.delegate collectionView:self mouseUpInItemAtIndexPath:indexPath];
 #pragma clang diagnostic pop
 	}
+    [self handleMouseDownUpEvent:event forIndexPath:indexPath];
+}
+
+-(void)handleMouseDownUpEvent:(NSEvent*)event forIndexPath:(NSIndexPath*)indexPath {
+    // Detect if modifier flags are held down.
+    // We prioritize the command key over the shift key.
+    BOOL isSingleSelect = YES;
+    if (self.allowsMultipleSelection) {
+        if (event.modifierFlags & NSCommandKeyMask) {
+            [self selectItemAtIndexPath:indexPath atScrollPosition:JNWCollectionViewScrollPositionNearest animated:YES selectionType:JNWCollectionViewSelectionTypeMultiple];
+            isSingleSelect = NO;
+        } else if (event.modifierFlags & NSShiftKeyMask) {
+            [self selectItemAtIndexPath:indexPath atScrollPosition:JNWCollectionViewScrollPositionNearest animated:YES selectionType:JNWCollectionViewSelectionTypeExtending];
+            isSingleSelect = NO;
+        }
+    }
+    if (isSingleSelect) {
+        [self selectItemAtIndexPath:indexPath atScrollPosition:JNWCollectionViewScrollPositionNearest animated:YES];
+    }
 }
 
 - (void)mouseMovedInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event {
@@ -1368,6 +1383,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 }
 
 - (void)mouseDraggedInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event {
+    NSLog(@"Mouse dragged -> %ld", cell.indexPath.jnw_item);
     if (_collectionViewFlags.delegateMouseDragged) {
         NSIndexPath *indexPath = [self indexPathForCell:cell];
         [self.delegate collectionView:self mouseDraggedInItemAtIndexPath:indexPath withEvent:event];
