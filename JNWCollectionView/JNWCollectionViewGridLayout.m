@@ -383,6 +383,8 @@ static const CGSize JNWCollectionViewGridLayoutDefaultSize = (CGSize){ 44.f, 44.
 
 #pragma Drag and Drop
 
+//self.numberOfColumnsList = allColumnNumbers;
+//self.itemPaddingList = addItemPaddings;
 - (JNWCollectionViewDropIndexPath *)dropIndexPathAtPoint:(NSPoint)point {
     [self scrollIfNecessaryForDragAtPoint:point];
     NSArray *visibleCells = [self.collectionView visibleCells];
@@ -395,6 +397,26 @@ static const CGSize JNWCollectionViewGridLayoutDefaultSize = (CGSize){ 44.f, 44.
                 } else {
                     return [JNWCollectionViewDropIndexPath indexPathForItem:path.jnw_item inSection:path.jnw_section dropRelation:JNWCollectionViewDropRelationAfter];
                 }
+            }
+        }
+        else {
+            // We may need to account for horizontal item padding to know which cell is being dropped on
+            NSUInteger numberOfColumns = self.numberOfColumnsList[cell.indexPath.jnw_section].unsignedIntegerValue;
+            NSUInteger positionCalculation = cell.indexPath.jnw_item % numberOfColumns;
+            BOOL isItemOnVeryLeft = positionCalculation == 0;
+            BOOL isItemOnVeryRight = positionCalculation == numberOfColumns;
+            CGRect rectWithSpacing = cell.frame;
+            // see if the drag operation is "between" cells by being "right of" the cell
+            CGFloat halfPadding = self.itemPaddingList[cell.indexPath.jnw_section].floatValue / 2;
+            rectWithSpacing.size.width += halfPadding;
+            if (!isItemOnVeryRight && CGRectContainsPoint(rectWithSpacing, point)) {
+                return [JNWCollectionViewDropIndexPath indexPathForItem:cell.indexPath.jnw_item inSection:cell.indexPath.jnw_section dropRelation:JNWCollectionViewDropRelationAfter];
+            }
+            // see if the drag operation is "between" cells by being "left of" the cell
+            rectWithSpacing = cell.frame;
+            rectWithSpacing.origin.x -= halfPadding;
+            if (!isItemOnVeryLeft && CGRectContainsPoint(rectWithSpacing, point)) {
+                return [JNWCollectionViewDropIndexPath indexPathForItem:cell.indexPath.jnw_item inSection:cell.indexPath.jnw_section dropRelation:JNWCollectionViewDropRelationAt];
             }
         }
     }
