@@ -735,7 +735,12 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	// First we prepare the layout. In the future it would possibly be a good idea to coalesce
 	// this call to reduce unnecessary layout preparation calls.
 	[self.data recalculateAndPrepareLayout:YES];
-	[self performFullRelayoutForcingSubviewsReset:YES];
+    // On 2018-03-27, Deadpikle changed the subview reset from YES to NO. He did not know
+    // why a layout invalidation should cause all subviews to be reset (read: reallocated),
+    // when cells should be able to be re-used between layout passes. Having this as YES
+    // forces all cells to be recreated on an invalidateLayout call.
+    // With this set to NO, the only time all subviews have a force reset is via reloadData.
+	[self performFullRelayoutForcingSubviewsReset:NO];
 }
 
 - (void)performFullRelayoutForcingSubviewsReset:(BOOL)forceReset {
