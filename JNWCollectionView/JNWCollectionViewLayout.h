@@ -187,5 +187,4 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewScrollDirection) {
 @end
 
 @interface JNWCollectionViewLayout(Deprecated)
-- (instancetype)initWithCollectionView:(JNWCollectionView *)collectionView __attribute__((deprecated("use -init instead.")));
 @end

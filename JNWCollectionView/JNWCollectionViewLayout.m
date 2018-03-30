@@ -56,10 +56,6 @@
 	// For subclasses
 }
 
-- (instancetype)initWithCollectionView:(JNWCollectionView *)collectionView {
-	return [super init];
-}
-
 - (JNWCollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath {
 	return nil;
 }
