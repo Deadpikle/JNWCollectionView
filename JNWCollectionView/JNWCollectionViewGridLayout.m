@@ -383,8 +383,6 @@ static const CGSize JNWCollectionViewGridLayoutDefaultSize = (CGSize){ 44.f, 44.
 
 #pragma Drag and Drop
 
-//self.numberOfColumnsList = allColumnNumbers;
-//self.itemPaddingList = addItemPaddings;
 - (JNWCollectionViewDropIndexPath *)dropIndexPathAtPoint:(NSPoint)point {
     [self scrollIfNecessaryForDragAtPoint:point];
     NSArray *visibleCells = [self.collectionView visibleCells];
