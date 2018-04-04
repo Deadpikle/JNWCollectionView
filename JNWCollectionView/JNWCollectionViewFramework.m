@@ -87,6 +87,7 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewSelectionType) {
 
 // Selection
 @property (nonatomic, strong, readwrite) NSMutableArray *selectedIndexes;
+@property (nonatomic) NSArray *selectedIndexesDiff;
 
 // Cells
 @property (nonatomic, strong) NSMutableDictionary *reusableCells; // { identifier : (cells) }
@@ -1196,7 +1197,6 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 }
 
 - (void)mouseDownInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event {
-    NSLog(@"Mouse down");
     NSIndexPath *indexPath = [self indexPathForCell:cell];
     if (indexPath == nil) {
         NSLog(@"***index path not found for selection.");
@@ -1218,9 +1218,14 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
     // Without handling it here in mouse down for unselected items, we would be able to start a drag
     // operation for selected cell #3 by starting to drag unselected cell #5 (or similar), which
     // is not what the user expects.
+    NSMutableArray *indicesBefore = [self.selectedIndexes mutableCopy];
+    
     if (![self.selectedIndexes containsObject:indexPath]) {
         [self handleMouseDownUpEvent:event forIndexPath:indexPath];
     }
+    NSMutableArray *indicesAfter = [self.selectedIndexes mutableCopy];
+    [indicesAfter removeObjectsInArray:indicesBefore];
+    self.selectedIndexesDiff = indicesAfter;
 }
 
 - (void)mouseUpInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event {
@@ -1239,7 +1244,13 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 		[self.delegate collectionView:self mouseUpInItemAtIndexPath:indexPath];
 #pragma clang diagnostic pop
 	}
-    [self handleMouseDownUpEvent:event forIndexPath:indexPath];
+    // if the selection wasn't modified by mouseDown actions, handle the mouseUp event.
+    // this fixes some issues where a command + mouse down (for multiple selection)
+    // would select the item on mouse down and then unselect it on mouse up
+    if (![self.selectedIndexesDiff containsObject:indexPath]) {
+        [self handleMouseDownUpEvent:event forIndexPath:indexPath];
+    }
+    self.selectedIndexesDiff = @[];
 }
 
 -(void)handleMouseDownUpEvent:(NSEvent*)event forIndexPath:(NSIndexPath*)indexPath {
@@ -1383,7 +1394,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 }
 
 - (void)mouseDraggedInCollectionViewCell:(JNWCollectionViewCell *)cell withEvent:(NSEvent *)event {
-    NSLog(@"Mouse dragged -> %ld", cell.indexPath.jnw_item);
+    //NSLog(@"Mouse dragged -> %ld", cell.indexPath.jnw_item);
     if (_collectionViewFlags.delegateMouseDragged) {
         NSIndexPath *indexPath = [self indexPathForCell:cell];
         [self.delegate collectionView:self mouseDraggedInItemAtIndexPath:indexPath withEvent:event];
