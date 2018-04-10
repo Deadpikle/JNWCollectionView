@@ -150,6 +150,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 	collectionView.allowsEmptySelection = YES;
 	
 	collectionView.allowsMultipleSelection = YES;
+    collectionView.allowsSelectAll = YES;
 	
 	collectionView.sendsMultipleSelectionCalls = YES;
 	
@@ -1368,7 +1369,7 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 }
 
 - (void)selectAll:(id)sender {
-	if (self.allowsMultipleSelection) {
+	if (self.allowsMultipleSelection && self.allowsSelectAll) {
 		[self selectItemsAtIndexPaths:[self allIndexPaths] animated:YES];
 		if (_collectionViewFlags.delegateDidSelectItemsChange) {
 			[self.delegate collectionView:self selectedItemsChangedToIndexPaths:[NSSet setWithArray:self.selectedIndexes]];

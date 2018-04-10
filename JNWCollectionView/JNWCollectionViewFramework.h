@@ -358,6 +358,11 @@ typedef NS_ENUM(NSInteger, JNWCollectionViewScrollPosition) {
 /// Defaults to YES.
 @property (nonatomic, assign) BOOL allowsMultipleSelection;
 
+/// If set to NO, the collection view will not respond to ⌘ + A (select all) with allowsMultipleSelection = YES.
+///
+/// Defaults to YES.
+@property (nonatomic, assign) BOOL allowsSelectAll;
+
 /// Returns the list of indexPaths of the selected items
 @property (nonatomic, readonly) NSMutableArray *selectedIndexes;
 
