@@ -117,7 +117,7 @@ static NSString * const headerIdentifier = @"HEADER";
             long fromIndex = fromPath.jnw_item;
             long toIndex = dropIndexPath.jnw_item;
             // moving to the right? must adjust index to be one less because we erase an item before inserting an item.
-            long finalDesination = toIndex;
+            long finalDestination = toIndex;
             if (fromSectionArray == toSectionArray) {
                 if (toIndex > fromIndex && dropIndexPath.jnw_relation != JNWCollectionViewDropRelationAfter) {
                     finalDesination = toIndex - 1;
@@ -125,14 +125,14 @@ static NSString * const headerIdentifier = @"HEADER";
                 // Move within a section.
                 id object = [toSectionArray objectAtIndex:fromIndex];
                 [toSectionArray removeObjectAtIndex:fromIndex];
-                [toSectionArray insertObject:object atIndex:finalDesination];
+                [toSectionArray insertObject:object atIndex:finalDestination];
             } else {
                 // Move between sections.
                 id object = [fromSectionArray objectAtIndex:fromIndex];
                 if (dropIndexPath.jnw_relation == JNWCollectionViewDropRelationAfter) {
                     finalDesination = toIndex + 1;
                 }
-                [toSectionArray insertObject:object atIndex:finalDesination];
+                [toSectionArray insertObject:object atIndex:finalDestination];
                 [fromSectionArray removeObjectAtIndex:fromIndex];
             }
         }
