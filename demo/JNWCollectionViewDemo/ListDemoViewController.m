@@ -120,7 +120,7 @@ static NSString * const headerIdentifier = @"HEADER";
             long finalDestination = toIndex;
             if (fromSectionArray == toSectionArray) {
                 if (toIndex > fromIndex && dropIndexPath.jnw_relation != JNWCollectionViewDropRelationAfter) {
-                    finalDesination = toIndex - 1;
+                    finalDestination = toIndex - 1;
                 }
                 // Move within a section.
                 id object = [toSectionArray objectAtIndex:fromIndex];
@@ -130,7 +130,7 @@ static NSString * const headerIdentifier = @"HEADER";
                 // Move between sections.
                 id object = [fromSectionArray objectAtIndex:fromIndex];
                 if (dropIndexPath.jnw_relation == JNWCollectionViewDropRelationAfter) {
-                    finalDesination = toIndex + 1;
+                    finalDestination = toIndex + 1;
                 }
                 [toSectionArray insertObject:object atIndex:finalDestination];
                 [fromSectionArray removeObjectAtIndex:fromIndex];
