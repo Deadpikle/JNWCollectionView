@@ -1463,14 +1463,10 @@ static void JNWCollectionViewCommonInit(JNWCollectionView *collectionView) {
 }
 
 - (void)draggingExited:(id<NSDraggingInfo>)sender {
-	//NSLog(@"Dragging exited");
-	// Drag has left the view. If it was an external drag operation, clean up
-	// the context.
-	if (!_dragContext.dragPaths) {
-		_dragContext = nil;
-		[self.collectionViewLayout prepareLayout];
-		[self updateDropMarker];
-	}
+	// Drag has left the view. Clean up the context so that the drag marker no longer displays.
+    _dragContext = nil;
+    [self.collectionViewLayout prepareLayout];
+    [self updateDropMarker];
 }
 
 - (void)draggingSession:(NSDraggingSession *)session endedAtPoint:(NSPoint)screenPoint operation:(NSDragOperation)operation {
