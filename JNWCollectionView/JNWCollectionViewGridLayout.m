@@ -386,9 +386,25 @@ static const CGSize JNWCollectionViewGridLayoutDefaultSize = (CGSize){ 44.f, 44.
 - (JNWCollectionViewDropIndexPath *)dropIndexPathAtPoint:(NSPoint)point {
     [self scrollIfNecessaryForDragAtPoint:point];
     NSArray *visibleCells = [self.collectionView visibleCells];
+    CGFloat greatestXCoord = 0.0f; // greatest X coordinate for final row
+    CGFloat greatestYCoord = 0.0f;
+    NSUInteger greatestCellIndex = 0;
+    NSUInteger greatestCellSection = 0;
     for (JNWCollectionViewCell *cell in visibleCells) {
+        NSIndexPath *path = [self.collectionView indexPathForCell:cell];
+        NSUInteger previousGreatestSection = greatestCellSection;
+        greatestCellSection = greatestCellSection > path.jnw_section ? greatestCellSection : path.jnw_section;
+        if (previousGreatestSection < greatestCellSection) {
+            greatestCellIndex = 0;
+        }
+        greatestCellIndex = greatestCellIndex > path.jnw_item ? greatestCellIndex : path.jnw_item;
+        CGFloat previousGreatestYCoord = greatestYCoord;
+        greatestYCoord = greatestYCoord > cell.frame.origin.y ? greatestYCoord : cell.frame.origin.y;
+        if (previousGreatestYCoord < greatestYCoord) {
+            greatestXCoord = 0;
+        }
+        greatestXCoord = greatestXCoord > cell.frame.origin.x + cell.frame.size.width ? greatestXCoord : cell.frame.origin.x + cell.frame.size.width;
         if (CGRectContainsPoint(cell.frame, point)) {
-            NSIndexPath *path = [self.collectionView indexPathForCell:cell];
             if (path) {
                 if (point.x <= cell.frame.origin.x + cell.frame.size.width * 0.5) {
                     return [JNWCollectionViewDropIndexPath indexPathForItem:path.jnw_item inSection:path.jnw_section dropRelation:JNWCollectionViewDropRelationAt];
@@ -417,6 +433,12 @@ static const CGSize JNWCollectionViewGridLayoutDefaultSize = (CGSize){ 44.f, 44.
                 return [JNWCollectionViewDropIndexPath indexPathForItem:cell.indexPath.jnw_item inSection:cell.indexPath.jnw_section dropRelation:JNWCollectionViewDropRelationAt];
             }
         }
+    }
+    // if dragging past all other cells while still in the JNWCollectionView, treat it as though dropping to last position
+    if (point.x > greatestXCoord || point.y > greatestYCoord) {
+        return [JNWCollectionViewDropIndexPath indexPathForItem:greatestCellIndex
+                                                      inSection:greatestCellSection
+                                                   dropRelation:JNWCollectionViewDropRelationAfter];
     }
     return nil;
 }
