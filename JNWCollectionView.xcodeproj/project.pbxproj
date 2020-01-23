@@ -484,6 +484,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jwilling.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = JNWCollectionView;
+				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Debug;
@@ -504,6 +505,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jwilling.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = JNWCollectionView;
+				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = framework;
 			};
 			name = Release;
